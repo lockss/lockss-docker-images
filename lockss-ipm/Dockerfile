@@ -32,5 +32,5 @@ FROM busybox:1.30.0
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
 
 # Install IPM
-ADD /docker/etc/* /etc/ipm/
-ADD /docker/bin/* /usr/local/bin/
+ADD /docker/ipm/etc/* /usr/local/etc/ipm/
+ADD /docker/ipm/bin/* /usr/local/bin/

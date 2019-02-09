@@ -29,15 +29,14 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-PKGS=''
-for ipkg in "$@" ; do
-  if grep -q -x "${ipkg}" /etc/ipm/ipm-originally.txt ; then
-    echo "${0}: keeping pre-installed idealized package: ${ipkg}" >&2
-    continue
-  fi
-  pkg=$(ipm-translate "${ipkg}")
-  if [ "$(ipm-check "${pkg}")" = "true" ]; then
-    PKGS="${PKGS} ${pkg}"
-  fi
-done
-ipm-uninstall-impl ${PKGS}
+IPM='ipm-install'
+if [ "X${1}" = "X--uninstall" ]; then
+  IPM='ipm-uninstall'
+fi
+
+$IPM curl \
+     dnsutils \
+     gzip \
+     less \
+     ping \
+     tar

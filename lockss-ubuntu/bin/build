@@ -29,13 +29,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-PKG="${1}"
-if [ "X${PKG}" = "X" ]; then
-  echo "${0}: expecting exactly one argument" >&2
-  exit 1
-fi
-if ipm-check-impl "${PKG}" ; then
-  echo 'true'
-else
-  echo 'false'
-fi
+PARENT_DIR="$(realpath "$(dirname "${0}")/..")"
+TAG='lockss/ubuntu:xenial'
+
+docker build --tag "${TAG}" "${PARENT_DIR}" \
+&& [ "X${1}" = "X--push" ] \
+&& docker push "${TAG}"

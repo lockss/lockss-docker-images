@@ -29,19 +29,24 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-IPM='ipm-install'
-if [ "X${1}" = 'X--uninstall' ]; then
-  IPM='ipm-uninstall'
+_0="$(basename "${0}")"
+ARG="${1}"
+ORIG='/usr/local/etc/ipm/ipm-originally.txt'
+
+if [ "${ARG}" = "--help" ]; then
+  echo "Usage: ${_0} IPKG"
+  echo "Prints true if the idealized package was originally installed, false otherwise"
+  exit 0
 fi
 
-$IPM bash \
-     file \
-     findutils \
-     lynx \
-     netcat \
-     openssh-client \
-     rsync \
-     tcpdump \
-     traceroute \
-     unzip \
-     zip
+if [ "$#" != "1" ]; then
+  echo "${_0}: expected exactly one argument but got $#" >&2
+  exit 1
+fi
+
+if [ ! -f "${ORIG}" ]; then
+  echo "${_0}: ${ORIG} not found; run ipm-setup" >&2
+  exit 1
+fi
+
+grep -q -x "${ARG}" "${ORIG}" && echo 'true' || echo 'false'

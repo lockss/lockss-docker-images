@@ -29,15 +29,27 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-IPM='ipm-install'
-if [ "X${1}" = "X--uninstall" ]; then
-  IPM='ipm-uninstall'
+_0="$(basename "${0}")"
+ARG="${1}"
+
+if [ "${ARG}" = "--help" ]; then
+  echo "Usage: ${_0}"
+  echo "Installs the given idealized packages"
+  exit 0
 fi
 
-$IPM curl \
-     dnsutils \
-     gzip \
-     less \
-     ping \
-     tar \
-     wget
+if [ "$#" = "0" ]; then
+  echo "${_0}: expected at least one argument" >&2
+  exit 1
+fi
+
+SPKGS=''
+for ipkg in "$@" ; do
+  if [ "$(ipm-check "${ipkg}")" = 'false' ]; then
+    SPKGS="${SPKGS} $(ipm-translate "${ipkg}")"
+  fi
+done
+
+ipm-update-impl
+ipm-install-impl ${SPKGS}
+ipm-clean-impl

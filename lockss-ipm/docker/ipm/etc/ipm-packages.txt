@@ -4,23 +4,24 @@ curl	URL retrieval utility and library
 dnsutils	DNS utilities (host, nslookup, dig, delv...)
 emacs	The extensible, customizable, self-documenting real-time display editor
 file	File type identification utility
-findutils	GNU utilities for finding files (find, xargs, locate...)
+findutils	GNU utilities for finding files (find, xargs...)
 gzip	A popular data compression program
 less	File pager
+links	Web browser running in both graphics and text mode
 lynx	Cross-platform text-based browser
+mtr	Full screen ncurses traceroute tool
 nano	Enhanced clone of the Pico text editor
 netcat	The TCP/IP swiss army knife
 openjdk8	OpenJDK 8 (JDK)
 openjdk8-jre	OpenJDK 8 (JRE)
 openssh-client	OpenBSD's SSH client
 ping	Tools to test the reachability of network hosts
+pkzip	PKZIP utilities (zip, unzip)
 python2	A high-level scripting language (2.x)
 python3	A high-level scripting language (3.x)
 rsync	A file transfer program to keep remote files in sync
 tar	Utility used to store, backup, and transport files
 tcpdump	A tool for network monitoring and data acquisition
 traceroute	Traces the route taken by packets over an IPv4/IPv6 network
-unzip	Extract PKZIP-compatible .zip files
 vim	Improved vi-style text editor
 wget	A network utility to retrieve files from the Web
-zip	Creates PKZIP-compatible .zip files

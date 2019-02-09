@@ -29,16 +29,31 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-PKG="${1}"
-if [ "X${PKG}" = "X" ]; then
-  echo "${0}: expecting exactly one argument" >&2
-  exit 1
-fi
-RET=$(awk -F"\t" "\$1 == \"${PKG}\" { print \$2 }" /etc/ipm/ipm-translate.txt)
-if [ "X${RET}" != "X" ]; then
-  echo "${RET}"
+_0="$(basename "${0}")"
+ARG="${1}"
+PKGS='/usr/local/etc/ipm/ipm-packages.txt'
+
+if [ "${ARG}" = "--help" ]; then
+  echo "Usage: ${_0}"
+  echo "Prints known idealized packages, with description and status"
+  echo "o = originally installed / i = installed / n = not installed"
   exit 0
-else
-  echo "${0}: unknown idealized package: ${PKG}" >&2
+fi
+
+if [ "$#" != "0" ]; then
+  echo "${_0}: expected no arguments" >&2
   exit 1
 fi
+
+sort /usr/local/etc/ipm/ipm-packages.txt | while read l ; do
+  ipkg=$(echo "${l}" | cut -f1)
+  desc=$(echo "${l}" | cut -f2)
+  if [ "$(ipm-originally "${ipkg}")" = 'true' ]; then
+    inst='o'
+  elif [ "$(ipm-check "${ipkg}")" = "true" ]; then
+    inst='i'
+  else
+    inst='n'
+  fi
+  printf '%.1s %-14s %-60s\n' "${inst}" "${ipkg}" "${desc}"
+done

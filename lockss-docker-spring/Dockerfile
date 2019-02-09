@@ -35,6 +35,6 @@ ONBUILD ARG SVC_PORT
 
 ONBUILD EXPOSE ${SVC_PORT}
 
-ONBUILD ADD ${JAR_FILE} /opt/lockss/spring-app.jar
+ONBUILD ADD target/current-with-deps.jar /opt/lockss/spring-app.jar
 
 ENTRYPOINT ["/usr/bin/java", "-jar", "/opt/lockss/spring-app.jar"]

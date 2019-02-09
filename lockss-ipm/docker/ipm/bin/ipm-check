@@ -29,8 +29,31 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-for ipkg in $(cut -s -f1 /etc/ipm/ipm-packages.txt); do
-  if [ "$(ipm-check "$(ipm-translate "${ipkg}")")" = "true" ]; then
-    echo "${ipkg}"
-  fi
-done > /etc/ipm/ipm-originally.txt
+_0="$(basename "${0}")"
+ARG="${1}"
+
+if [ "${ARG}" = "--help" ]; then
+  echo "Usage: ${_0} IPKG"
+  echo "Prints true if the idealized package is currently installed, false otherwise"
+  exit 0
+fi
+
+if [ "$#" != "1" ]; then
+  echo "${_0}: expected exactly one argument but got $#" >&2
+  exit 1
+fi
+
+if ! which ipm-check-impl 2>&1 > /dev/null ; then
+  echo "${_0}: ipm-check-impl is not supplied on the PATH" >&2
+  exit 1
+fi
+
+for spkg in $(ipm-translate "${ARG}") ; do
+  if ! ipm-check-impl "${spkg}" ; then
+    echo 'false'
+    exit 0
+  fi 
+done
+
+echo 'true'
+exit 0
