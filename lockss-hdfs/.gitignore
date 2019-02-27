@@ -1,0 +1,6 @@
+# IntelliJ files and directories
+.idea/
+*.iml
+
+download/
+docker/tmp/
