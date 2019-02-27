@@ -5,6 +5,7 @@ dnsutils	bind-tools
 emacs	emacs-nox
 file	file
 findutils	findutils
+gettext	gettext
 gzip	busybox
 less	busybox
 links	links
@@ -15,6 +16,8 @@ netcat	busybox
 openjdk8	openjdk8
 openjdk8-jre	openjdk8-jre
 openssh-client	openssh-client
+openssh-server	openssh-server
+pdsh	pdsh
 ping	busybox
 pkzip	unzip zip
 python2	python2
