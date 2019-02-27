@@ -5,6 +5,7 @@ dnsutils	dnsutils
 emacs	emacs-nox
 file	file
 findutils	findutils
+gettext	gettext
 gzip	gzip
 less	less
 links	links
@@ -15,6 +16,8 @@ netcat	netcat
 openjdk8	openjdk-8-jdk-headless
 openjdk8-jre	openjdk-8-jre-headless
 openssh-client	openssh-client
+openssh-server	openssh-server
+pdsh	pdsh
 ping	iputils-ping
 pkzip	unzip zip
 python2	python2
