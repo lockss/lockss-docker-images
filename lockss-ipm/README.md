@@ -15,7 +15,7 @@ Use `ipm-list` to learn about packages: `o` for originally installed, `i` for in
 In order to work, a conforming implementation must provide:
 
 *   `/usr/local/etc/ipm/ipm-translate.txt`. This file contains one line for each line in `/usr/local/etc/ipm/ipm-packages.txt`, of the form `<ipkg> <tab> <spkg1> <spaces> <spkg2> ... <spaces> <spkgN> <newline>`, where `<ipkg>` is the name of an idealized package, and `<spkg1>`, `<spkg2>`, ..., `<spkgN>` are actual system packages corresponding to the idealized package. The idealized package and the list of system packages are separated by a tab. The system packages are separated by one or more spaces (but not tabs).
-*   `ipm-check-impl`: accepts one systempackage name, produces absolutely no output, exits with `0` if the actual package is installed or `>0` otherwise
+*   `ipm-check-impl`: accepts one system package name, produces absolutely no output, exits with `0` if the actual package is installed or `>0` otherwise
 *   `ipm-install-impl`: accepts one or more system package names, causes the package manager to install them
 *   `ipm-uninstall-impl`: accepts one or more system package names, causes the package manager to uninstall them
 *   `ipm-update-impl`: causes the package manager to update and reload its package definitions, usually from the network

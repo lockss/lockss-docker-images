@@ -5,6 +5,7 @@ dnsutils	DNS utilities (host, nslookup, dig, delv...)
 emacs	The extensible, customizable, self-documenting real-time display editor
 file	File type identification utility
 findutils	GNU utilities for finding files (find, xargs...)
+gettext	GNU locale utilities
 gzip	A popular data compression program
 less	File pager
 links	Web browser running in both graphics and text mode
@@ -14,7 +15,9 @@ nano	Enhanced clone of the Pico text editor
 netcat	The TCP/IP swiss army knife
 openjdk8	OpenJDK 8 (JDK)
 openjdk8-jre	OpenJDK 8 (JRE)
-openssh-client	OpenBSD's SSH client
+openssh-client	OpenBSD SSH client
+openssh-server	OpenBSD SSH server
+pdsh	A high performance, parallel remote shell utility
 ping	Tools to test the reachability of network hosts
 pkzip	PKZIP utilities (zip, unzip)
 python2	A high-level scripting language (2.x)
