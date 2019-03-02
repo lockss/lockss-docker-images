@@ -49,4 +49,4 @@ if [ ! -f "${ORIG}" ]; then
   exit 1
 fi
 
-grep -q -x "${ARG}" "${ORIG}" && echo 'true' || echo 'false'
+awk "BEGIN { e = 1 } \$0 == \"${ARG}\" { e = 0 ; exit } END { exit e }" "${ORIG}" && echo 'true' || echo 'false'

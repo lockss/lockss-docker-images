@@ -30,6 +30,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 _0="$(basename "${0}")"
+
 ARG="${1}"
 
 if [ "${ARG}" = "--help" ]; then
@@ -38,18 +39,18 @@ if [ "${ARG}" = "--help" ]; then
   exit 0
 fi
 
-if [ "$#" != "1" ]; then
+if [ $# -ne 1 ]; then
   echo "${_0}: expected exactly one argument but got $#" >&2
   exit 1
 fi
 
-if ! which ipm-check-impl 2>&1 > /dev/null ; then
-  echo "${_0}: ipm-check-impl is not supplied on the PATH" >&2
+if ! which ipm-check-native > /dev/null 2>&1 ; then
+  echo "${_0}: ipm-check-native is not on the PATH" >&2
   exit 1
 fi
 
-for spkg in $(ipm-translate "${ARG}") ; do
-  if ! ipm-check-impl "${spkg}" ; then
+for npkg in $(ipm-translate "${ARG}") ; do
+  if ! ipm-check-native "${npkg}" ; then
     echo 'false'
     exit 0
   fi 

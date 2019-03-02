@@ -36,14 +36,10 @@ fi
 
 $IPM bash \
      file \
-     findutils \
+     jq \
      lynx \
      mtr \
-     netcat \
      openssh-client \
      rsync \
      tcpdump \
-     traceroute \
-     unzip \
-     wget \
-     zip
+     traceroute

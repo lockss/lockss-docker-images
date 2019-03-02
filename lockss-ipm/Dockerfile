@@ -27,10 +27,20 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM busybox:1.30.0
+FROM busybox:1.30.1
 
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
 
 # Install IPM
 ADD /docker/ipm/etc/* /usr/local/etc/ipm/
+ONBUILD ADD /docker/ipm/etc/ipm-translate.txt \
+            /docker/ipm/etc/* \
+              /usr/local/etc/ipm/
 ADD /docker/ipm/bin/* /usr/local/bin/
+ONBUILD ADD /docker/ipm/bin/ipm-update-native \
+            /docker/ipm/bin/ipm-upgrade-native \
+            /docker/ipm/bin/ipm-install-native \
+            /docker/ipm/bin/ipm-uninstall-native \
+            /docker/ipm/bin/ipm-clean-native \
+            /docker/ipm/bin/ipm-check-native \
+              /usr/local/bin/
