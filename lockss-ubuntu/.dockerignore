@@ -28,6 +28,5 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 # Exclude everything but what is needed
-*
-# Include the docker directory
-!/docker
+/*
+!/docker/

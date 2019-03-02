@@ -27,17 +27,13 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/ipm:1 AS lockss-ipm
+FROM lockss/lockss-ipm:2.0 AS lockss-ipm
 
-FROM ubuntu:xenial
+FROM ubuntu:xenial-20190122
 
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
 
 # Install IPM
 COPY --from=lockss-ipm /usr/local/etc/ipm/* /usr/local/etc/ipm/
-ADD /docker/ipm/etc/* /usr/local/etc/ipm/
 COPY --from=lockss-ipm /usr/local/bin/* /usr/local/bin/
-ADD /docker/ipm/bin/* /usr/local/bin/
-RUN ipm-setup \
- && install-essential-packages \
- && apt-get --assume-yes install apt-transport-https
+RUN ipm-setup apt-transport-https
