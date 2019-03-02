@@ -29,10 +29,10 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-PARENT_DIR="$(realpath "$(dirname "${0}")/..")"
-DOWNLOAD="${PARENT_DIR}/download"
-TMP="${PARENT_DIR}/docker/tmp"
-TAG='lockss/hdfs'
+ROOT_DIR="$(realpath "$(dirname "${0}")/..")"
+DOWNLOAD="${ROOT_DIR}/download"
+TMP="${ROOT_DIR}/docker/tmp"
+TAG='lockss/lockss-hdfs'
 
 HADOOP_VERSION='3.0.3'
 HADOOP_URL="https://archive.apache.org/dist/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz"
@@ -42,6 +42,6 @@ HADOOP_FILE="${TMP}/hadoop.tgz"
 mkdir --parents "${DOWNLOAD}" "${TMP}" \
 && curl --location "${HADOOP_URL}" --output "${HADOOP_DOWNLOAD}" --time-cond "${HADOOP_DOWNLOAD}" \
 && cp "${HADOOP_DOWNLOAD}" "${HADOOP_FILE}" \
-&& docker build --tag "${TAG}" "${PARENT_DIR}" \
+&& docker build --tag "${TAG}" "${ROOT_DIR}" \
 && [ "${1}" = '--push' ] \
 && docker push "${TAG}"

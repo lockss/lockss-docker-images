@@ -76,6 +76,6 @@ Check_Executable()
 && mkdir -p "${HADOOP_HOME}/etc/hadoop" \
 && Apply_Config "${HADOOP_HOME}/etc.orig/hadoop" \
 && Apply_Config "${HADOOP_CONF}" \
-&& if [ ! -f "${HADOOP_DATA}/dfs/name/current/VERSION" ]; then ( yes n | bin/hdfs namenode -format ) ; fi \
+&& if [ ! -f "${HADOOP_DATA}/dfs/name/current/VERSION" ]; then ( yes n | "${HADOOP_HOME}/bin/hdfs" namenode -format ) ; fi \
 && "${HADOOP_HOME}/sbin/start-dfs.sh" \
 && tail -f "${HADOOP_LOGS}/"*.log "${HADOOP_LOGS}/"*.out

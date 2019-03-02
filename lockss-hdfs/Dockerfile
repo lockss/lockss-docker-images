@@ -27,7 +27,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/ubuntu:xenial
+FROM lockss/lockss-ubuntu:xenial
 
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
 
@@ -54,10 +54,9 @@ ENV HDFS_JNHTTP=8480 \
 EXPOSE ${HDFS_FS}
 
 # Install packages
-RUN ipm-update-impl \
+RUN ipm-update \
  && ipm-install bash \
                 gettext \
-                netcat \
                 openjdk8-jre \
                 openssh-client \
                 openssh-server \
@@ -72,7 +71,8 @@ RUN chown -R root:root /tmp/tmpfiles \
  && cd "${HADOOP_HOME}" \
  && mv etc etc.orig \
  && sed -i.orig -e 's@^\(root:.*:\)[^:]\+$@\1/bin/bash@' /etc/passwd \
- && rm -rf /tmp/tmpfiles
+ && rm -rf /tmp/tmpfiles \
+ && ipm-clean
 ADD /docker/hadoop/etc/* /usr/local/share/hadoop/etc.orig/hadoop/
 
 # Add scripts including entry point
