@@ -29,9 +29,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-PARENT_DIR="$(realpath "$(dirname "${0}")/..")"
-TAG='lockss/alpine:3.9'
+ROOT_DIR="$(realpath "$(dirname "${0}")/..")"
+TAG='lockss/lockss-alpine:3.9'
 
-docker build --tag "${TAG}" "${PARENT_DIR}" \
-&& [ "X${1}" = "X--push" ] \
+docker build --tag "${TAG}" "${ROOT_DIR}" \
+&& [ "${1}" = "--push" ] \
 && docker push "${TAG}"
