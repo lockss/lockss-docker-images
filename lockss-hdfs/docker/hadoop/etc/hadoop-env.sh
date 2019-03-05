@@ -209,7 +209,7 @@ export HADOOP_LOG_DIR=/var/log/hadoop
 # export HADOOP_STOP_TIMEOUT=5
 
 # Where pid files are stored.  /tmp by default.
-# export HADOOP_PID_DIR=/tmp
+export HADOOP_PID_DIR=/var/run
 
 # Default log4j setting for interactive commands
 # Java property: hadoop.root.logger
