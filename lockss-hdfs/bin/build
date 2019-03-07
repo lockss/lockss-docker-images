@@ -31,15 +31,15 @@
 
 ROOT_DIR="$(realpath "$(dirname "${0}")/..")"
 DOWNLOAD="${ROOT_DIR}/download"
-TMP="${ROOT_DIR}/docker/tmp"
+TEMP="${ROOT_DIR}/docker/temp"
 TAG='lockss/lockss-hdfs'
 
 HADOOP_VERSION='3.0.3'
 HADOOP_URL="https://archive.apache.org/dist/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz"
-HADOOP_DOWNLOAD="${DOWNLOAD}/hadoop-${HADOOP_VERSION}.tgz"
-HADOOP_FILE="${TMP}/hadoop.tgz"
+HADOOP_DOWNLOAD="${DOWNLOAD}/hadoop-${HADOOP_VERSION}.tar.gz"
+HADOOP_FILE="${TEMP}/hadoop.tgz"
 
-mkdir --parents "${DOWNLOAD}" "${TMP}" \
+mkdir --parents "${DOWNLOAD}" "${TEMP}" \
 && curl --location "${HADOOP_URL}" --output "${HADOOP_DOWNLOAD}" --time-cond "${HADOOP_DOWNLOAD}" \
 && cp "${HADOOP_DOWNLOAD}" "${HADOOP_FILE}" \
 && docker build --tag "${TAG}" "${ROOT_DIR}" \

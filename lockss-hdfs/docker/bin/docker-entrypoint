@@ -75,6 +75,7 @@ Check_Executable()
 && lockss-hdfs-launch-sshd \
 && mkdir -p "${HADOOP_HOME}/etc/hadoop" \
 && Apply_Config "${HADOOP_HOME}/etc.orig/hadoop" \
+&& Apply_Config "${HADOOP_HOME}/etc.base/hadoop" \
 && Apply_Config "${HADOOP_CONF}" \
 && if [ ! -f "${HADOOP_DATA}/dfs/name/current/VERSION" ]; then ( yes n | "${HADOOP_HOME}/bin/hdfs" namenode -format ) ; fi \
 && "${HADOOP_HOME}/sbin/start-dfs.sh" \

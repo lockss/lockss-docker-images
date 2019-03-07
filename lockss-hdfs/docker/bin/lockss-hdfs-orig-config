@@ -29,8 +29,4 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-ROOT_DIR="$(realpath "$(dirname "${0}")/..")"
-DOWNLOAD="${ROOT_DIR}/download"
-TEMP="${ROOT_DIR}/docker/temp"
-
-rm -rf "${DOWNLOAD}" "${TEMP}"
+cd "${HADOOP_HOME}/etc.base/hadoop" && tar cf - .

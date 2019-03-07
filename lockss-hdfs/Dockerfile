@@ -61,20 +61,21 @@ RUN ipm-update \
                 openjdk8-jre \
                 openssh-client \
                 openssh-server \
+ && ipm-clean \
  && cp /etc/ssh/ssh_config /etc/ssh/ssh_config.orig \
  && cp /etc/ssh/sshd_config /etc/ssh/sshd_config.orig
-ADD /docker/ssh/etc/* /etc/ssh/
+COPY /docker/ssh/etc/* /etc/ssh/
 
-# Install Hadoop + make root use Bash + clean up)
-ADD /docker/tmp/* /tmp/tmpfiles/
-RUN chown -R root:root /tmp/tmpfiles \
- && mv /tmp/tmpfiles/hadoop-* "${HADOOP_HOME}" \
+# Install Hadoop + make root use Bash + clean up
+COPY /docker/temp/* /tmp/tmpfiles/
+RUN tar xzf /tmp/tmpfiles/hadoop.tgz -C /usr/local/share \
+ && ln -s /usr/local/share/hadoop-* "${HADOOP_HOME}" \
  && cd "${HADOOP_HOME}" \
  && mv etc etc.orig \
+ && mkdir -p etc.base \
  && sed -i.orig -e 's@^\(root:.*:\)[^:]\+$@\1/bin/bash@' /etc/passwd \
- && rm -rf /tmp/tmpfiles \
- && ipm-clean
-ADD /docker/hadoop/etc/* /usr/local/share/hadoop/etc.orig/hadoop/
+ && rm -rf /tmp/tmpfiles
+COPY /docker/hadoop/etc/* /usr/local/share/hadoop/etc.base/hadoop/
 
 # Add scripts including entry point
 ADD /docker/bin/* /usr/local/bin/
