@@ -27,60 +27,47 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-ubuntu:xenial
+FROM lockss/lockss-alpine:3.9
 
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
 
-# JAVA_HOME depends on the Linux flavor
-ENV HDFS_JNHTTP=8480 \
-    HDFS_JNHTTPS=8481 \
-    HDFS_JN=8485 \
-    HDFS_FS=9000 \
-    HDFS_DNHTTP=9864 \
-    HDFS_DNHTTPS=9865 \
-    HDFS_DN=9866 \
-    HDFS_DNIPC=9867 \
-    HDFS_SNNHTTP=9868 \
-    HDFS_SNNHTTPS=9869 \
-    HDFS_NNHTTP=9870 \
-    HDFS_NNHTTPS=9871 \
-    HDFS_BNN=50100 \
-    HDFS_BNNHTTP=50105 \
-    JAVA_HOME=/usr/lib/jvm/java-1.8-openjdk \
-    HADOOP_HOME=/usr/local/share/hadoop \
-    HADOOP_DATA=/hadoop \
-    HADOOP_CONF=/usr/local/etc/hadoop \
-    HADOOP_LOGS=/var/log/hadoop \
-    HADOOP_PIDS=/var/run
+# Mandatory build arguments (child)
+ONBUILD ARG LOCKSS_MAVEN_GROUP
+ONBUILD ARG LOCKSS_MAVEN_ARTIFACT
+ONBUILD ARG LOCKSS_MAVEN_VERSION
+ONBUILD ARG LOCKSS_REST_PORT
+ONBUILD RUN test -n "${LOCKSS_MAVEN_GROUP}"    || exit 1 \
+         && test -n "${LOCKSS_MAVEN_ARTIFACT}" || exit 2 \
+         && test -n "${LOCKSS_MAVEN_VERSION}"  || exit 3 \
+         && test -n "${LOCKSS_REST_PORT}"      || exit 4
+ONBUILD ENV LOCKSS_MAVEN_GROUP="${LOCKSS_MAVEN_GROUP}" \
+            LOCKSS_MAVEN_ARTIFACT="${LOCKSS_MAVEN_ARTIFACT}" \
+            LOCKSS_MAVEN_VERSION="${LOCKSS_MAVEN_VERSION}" \
+            LOCKSS_REST_PORT="${LOCKSS_REST_PORT}"
 
-EXPOSE ${HDFS_FS}
+# Optional build arguments (child)
+ONBUILD ARG LOCKSS_UI_PORT
+ONBUILD ENV LOCKSS_UI_PORT="${LOCKSS_UI_PORT}"
+                       
+# Environment variables
+ENV CONFIGS=/run/configs \
+    SECRETS=/run/secrets \
+    LOCKSS_HOME=/usr/local/share/lockss \
+    LOCKSS_PIDS=/var/run \
+    LOCKSS_DATA=/data \
+    LOCKSS_LOGS=/var/log/lockss
 
-# Install packages
 RUN ipm-update \
- && ipm-install bash \
-                gettext \
+ && ipm-install netcat \
                 openjdk8-jre \
-                openssh-client \
-                openssh-server \
- && ipm-clean \
- && cp /etc/ssh/ssh_config /etc/ssh/ssh_config.orig \
- && cp /etc/ssh/sshd_config /etc/ssh/sshd_config.orig
-COPY /docker/ssh/etc/* /etc/ssh/
+ && ipm-clean
 
-# Install Hadoop + make root use Bash + clean up
-COPY /docker/temp/* /tmp/tmpfiles/
-RUN tar xzf /tmp/tmpfiles/hadoop.tgz -C /usr/local/share \
- && ln -s /usr/local/share/hadoop-* "${HADOOP_HOME}" \
- && cd "${HADOOP_HOME}" \
- && mv etc etc.orig \
- && mkdir -p etc.base \
- && sed -i.orig -e 's@^\(root:.*:\)[^:]\+$@\1/bin/bash@' /etc/passwd \
- && rm -rf /tmp/tmpfiles
-COPY /docker/hadoop/etc/* /usr/local/share/hadoop/etc.base/hadoop/
-
-# Add scripts including entry point and health check
 COPY /docker/bin/* /usr/local/bin/
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 
 HEALTHCHECK --retries=1 --start-period=60s CMD ["/usr/local/bin/docker-healthcheck"]
+
+ONBUILD EXPOSE ${LOCKSS_REST_PORT}
+
+ONBUILD COPY /target/current-with-deps.jar "${LOCKSS_HOME}/lib/lockss.jar"

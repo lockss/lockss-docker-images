@@ -1,4 +1,6 @@
-# Copyright (c) 2000-2018, Board of Trustees of Leland Stanford Jr. University
+#!/bin/sh
+
+# Copyright (c) 2000-2019, Board of Trustees of Leland Stanford Jr. University
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -13,7 +15,7 @@
 #
 # 3. Neither the name of the copyright holder nor the names of its contributors
 # may be used to endorse or promote products derived from this software without
-# specific prior written permission. 
+# specific prior written permission.
 #
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -27,14 +29,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM openjdk:8-jdk-slim
+ROOT_DIR="$(realpath "$(dirname "${0}")/..")"
+TAG='lockss/lockss-spring:2.0'
 
-MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
-
-ONBUILD ARG SVC_PORT
-
-ONBUILD EXPOSE ${SVC_PORT}
-
-ONBUILD ADD target/current-with-deps.jar /opt/lockss/spring-app.jar
-
-ENTRYPOINT ["/usr/bin/java", "-jar", "/opt/lockss/spring-app.jar"]
+docker build --tag "${TAG}" "${ROOT_DIR}" \
+&& [ "${1}" = "--push" ] \
+&& docker push "${TAG}"
