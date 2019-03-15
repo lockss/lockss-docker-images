@@ -21,7 +21,8 @@ Optional build arguments in the child:
 
 The following environment variables are defined:
 
-*   `CONFIGS`: the expected root of Docker configs (`/run/configs`); see **Docker Configs**
+*   `CONFIGS`: the Docker configs directory (`/run/configs` rather than `/`); see **Docker Configs**
+*   `SECRETS`: the Docker secrets directory (`/run/configs`); see **Docker Configs**
 *   `LOCKSS_HOME`: the service installation directory (`/usr/local/share/lockss`)
 *   `LOCKSS_PIDS`: the PID directory for `lockss.pid` (`/var/run`)
 *   `LOCKSS_DATA`: the data directory (`/data`); see **Docker Volumes**

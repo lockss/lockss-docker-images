@@ -27,51 +27,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-alpine:3.9
-
-MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
-
-# Mandatory build arguments (child)
-ONBUILD ARG LOCKSS_MAVEN_GROUP
-ONBUILD ARG LOCKSS_MAVEN_ARTIFACT
-ONBUILD ARG LOCKSS_MAVEN_VERSION
-ONBUILD ARG LOCKSS_REST_PORT
-ONBUILD RUN test -n "${LOCKSS_MAVEN_GROUP}"    || exit 1 \
-         && test -n "${LOCKSS_MAVEN_ARTIFACT}" || exit 2 \
-         && test -n "${LOCKSS_MAVEN_VERSION}"  || exit 3 \
-         && test -n "${LOCKSS_REST_PORT}"      || exit 4
-
-# Optional build arguments (child)
-ONBUILD ARG LOCKSS_UI_PORT
-
-# Environment variables (child)
-ONBUILD ENV LOCKSS_MAVEN_GROUP="${LOCKSS_MAVEN_GROUP}" \
-            LOCKSS_MAVEN_ARTIFACT="${LOCKSS_MAVEN_ARTIFACT}" \
-            LOCKSS_MAVEN_VERSION="${LOCKSS_MAVEN_VERSION}" \
-            LOCKSS_REST_PORT="${LOCKSS_REST_PORT}" \
-            LOCKSS_UI_PORT="${LOCKSS_UI_PORT}"
-
-# Environment variables
-ENV CONFIGS=/run/configs \
-    SECRETS=/run/secrets \
-    LOCKSS_HOME=/usr/local/share/lockss \
-    LOCKSS_PIDS=/var/run \
-    LOCKSS_DATA=/data \
-    LOCKSS_LOGS=/var/log/lockss
-
-RUN ipm-update \
- && ipm-install gettext \
-                netcat \
-                openjdk8-jre \
- && ipm-clean
-
-COPY /docker/bin/* /usr/local/bin/
-COPY /docker/lockss/etc.base/* "${LOCKSS_HOME}/etc.base/"
-
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
-
-HEALTHCHECK --retries=1 --start-period=60s CMD ["/usr/local/bin/docker-healthcheck"]
-
-ONBUILD EXPOSE ${LOCKSS_REST_PORT} ${LOCKSS_UI_PORT}
-
-ONBUILD COPY /target/current-with-deps.jar "${LOCKSS_HOME}/lib/lockss.jar"
+org.lockss.platform.diskSpacePaths=${LOCKSS_DATA}
+org.lockss.platform.tmpDir=/tmp
+org.lockss.platform.logdirectory=${LOCKSS_LOGS}
+org.lockss.platform.logfile=daemon

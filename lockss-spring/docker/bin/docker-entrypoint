@@ -35,6 +35,26 @@ JVM_OPTS_DOCKER='-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHe
 JVM_OPTS_LOGGING='-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -Dorg.springframework.boot.logging.LoggingSystem=none'
 LOCKSS_JAR="${LOCKSS_HOME}/lib/lockss.jar"
 
+Apply_Config()
+{
+  if [ -d "${1}" ]; then
+    : \
+    && TMP=$(mktemp -d) \
+    && cd "${TMP}" \
+    && ( cd "${1}" && tar cf - . ) | tar xf - \
+    && for f in $(find . -type f -name '*.tpl'); do
+         envsubst < "${f}" > "$(dirname "${f}")/$(basename "${f}" '.tpl')"
+       done \
+    && cd "${LOCKSS_HOME}/etc" \
+    && ( cd "${TMP}" && tar cf - --exclude '*.tpl' . ) | tar xf -
+    RET=$?
+    rm -rf "${TMP}"
+    return $RET
+  else
+    return 0
+  fi
+}
+
 Check_Dir()
 {
   if [ ! -d "${1}" ]; then
@@ -69,6 +89,7 @@ Check_Set()
 
 # Sanity checks
 
+Check_Executable 'envsubst'
 Check_Executable 'java'
 
 Check_Set "${LOCKSS_LOGS}" LOCKSS_LOGS
@@ -83,8 +104,11 @@ Check_Dir "${LOCKSS_HOME}"
 Check_Set "${LOCKSS_JAR}" LOCKSS_JAR
 Check_File "${LOCKSS_JAR}"
 
+mkdir -p "${LOCKSS_HOME}/etc"
+Apply_Config "${LOCKSS_HOME}/etc.base"
+
 Check_File "${CONFIGS}/lockss_bootstrap"
-ARGS_BOOTSTRAP="-b ${CONFIGS}/lockss_bootstrap"
+ARGS_BOOTSTRAP="-b ${LOCKSS_HOME}/etc/lockss_bootstrap_base -b ${CONFIGS}/lockss_bootstrap"
 
 if [ "${LOCKSS_IS_CONFIG}" = 'true' ]; then
   Check_Set "${LOCKSS_PROPS_URL}" LOCKSS_PROPS_URL
