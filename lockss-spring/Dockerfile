@@ -51,6 +51,8 @@ ONBUILD ENV LOCKSS_MAVEN_GROUP="${LOCKSS_MAVEN_GROUP}" \
             LOCKSS_REST_PORT="${LOCKSS_REST_PORT}" \
             LOCKSS_UI_PORT="${LOCKSS_UI_PORT}"
 
+ONBUILD EXPOSE ${LOCKSS_REST_PORT} ${LOCKSS_UI_PORT}
+
 # Environment variables
 ENV CONFIGS=/run/configs \
     SECRETS=/run/secrets \
@@ -65,13 +67,11 @@ RUN ipm-update \
                 openjdk8-jre \
  && ipm-clean
 
-COPY /docker/bin/* /usr/local/bin/
-COPY /docker/lockss/etc.base/* "${LOCKSS_HOME}/etc.base/"
-
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 
 HEALTHCHECK --retries=1 --start-period=60s CMD ["/usr/local/bin/docker-healthcheck"]
 
-ONBUILD EXPOSE ${LOCKSS_REST_PORT} ${LOCKSS_UI_PORT}
-
+COPY /docker/bin/* /usr/local/bin/
+COPY /docker/lockss/etc.base/lockss_bootstrap_base.tpl "${LOCKSS_HOME}/etc.base/"
+ONBUILD COPY /docker/lockss/etc.base/lockss_service_base.tpl "${LOCKSS_HOME}/etc.base/"
 ONBUILD COPY /target/current-with-deps.jar "${LOCKSS_HOME}/lib/lockss.jar"
