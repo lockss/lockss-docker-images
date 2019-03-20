@@ -8,6 +8,7 @@ emacs	emacs-nox
 file	file
 findutils	busybox
 gettext	gettext
+gnupg	gnupg
 grep	busybox
 gzip	busybox
 jq	jq

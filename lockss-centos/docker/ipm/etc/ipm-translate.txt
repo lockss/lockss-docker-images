@@ -8,6 +8,7 @@ emacs	emacs-nox
 file	file
 findutils	findutils
 gettext	gettext
+gnupg	gnupg2
 grep	grep
 gzip	gzip
 jq	jq

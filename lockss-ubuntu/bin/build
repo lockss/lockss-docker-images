@@ -30,7 +30,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 PARENT_DIR="$(realpath "$(dirname "${0}")/..")"
-TAG='lockss/lockss-ubuntu:xenial'
+TAG='lockss/lockss-ubuntu:xenial-20190122-2'
 
 docker build --tag "${TAG}" "${PARENT_DIR}" \
 && [ "X${1}" = "X--push" ] \

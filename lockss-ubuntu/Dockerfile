@@ -27,7 +27,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-ipm:2.0 AS lockss-ipm
+FROM lockss/lockss-ipm:2.1 AS lockss-ipm
 
 FROM ubuntu:xenial-20190122
 

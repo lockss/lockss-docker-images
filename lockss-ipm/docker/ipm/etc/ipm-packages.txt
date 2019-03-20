@@ -8,6 +8,7 @@ emacs	The extensible, customizable, self-documenting real-time display editor
 file	File type identification utility
 findutils	GNU utilities for finding files (find, xargs...)
 gettext	GNU locale utilities
+gnupg	GNU Privacy Guard 2 - a PGP replacement tool
 grep	Pattern matching utilities
 gzip	A popular data compression program
 jq	A lightweight and flexible command-line JSON processor
