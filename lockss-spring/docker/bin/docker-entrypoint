@@ -82,7 +82,7 @@ Check_File()
 Check_Set()
 {
   if [ -z "${1}" ]; then
-    echo "${_0}: environment variable is not set: ${2}"
+    echo "${_0}: environment variable not set: ${2}"
     exit 1
   fi
 }
