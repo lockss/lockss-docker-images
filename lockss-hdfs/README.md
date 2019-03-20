@@ -17,7 +17,7 @@ The runtime configuration of the cluster is built into `$HADOOP_HOME/etc/hadoop`
 
 *   The unaltered Hadoop configuration durectory from the Hadoop installation archive (found at `$HADOOP_HOME/etc.orig/hadoop`).
 *   The base configuration directory from this image (found at `$HADOOP_HOME`)
-*   A user-supplied configuration directory, mounted at `/usr/local/etc/hadoop` (`$HADOOP_CONF`).
+*   An optional user-supplied configuration directory, mounted at `/usr/local/etc/hadoop` (`$HADOOP_CONF`).
 
 These directories can contains files (and if that's a file found in a previous layer, it shadows the previous version), or templates that are processed with `envsubst` from the environment (where `foo.ext.tpl` gets generated into `foo.ext`).
 
