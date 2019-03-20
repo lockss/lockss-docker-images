@@ -1,0 +1,108 @@
+#!/bin/sh
+
+# Copyright (c) 2000-2019, Board of Trustees of Leland Stanford Jr. University
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Neither the name of the copyright holder nor the names of its contributors
+# may be used to endorse or promote products derived from this software without
+# specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
+_0="$(basename "${0}")"
+
+Check_Dir()
+{
+  if [ ! -d "${1}" ]; then
+    echo "${_0}: directory not found: ${1}"
+    exit 1
+  fi
+}
+
+Check_Executable()
+{
+  if ! which "${1}" > /dev/null 2>&1 ; then
+    echo "${_0}: PATH executable not found: ${1}"
+    exit 1
+  fi
+}
+
+Check_File()
+{
+  if [ ! -f "${1}" ]; then
+    echo "${_0}: file not found: ${1}"
+    exit 1
+  fi
+}
+
+Check_Set()
+{
+  if [ -z "${1}" ]; then
+    echo "${_0}: environment variable not set: ${2}"
+    exit 1
+  fi
+}
+
+Check_Set "${PYWB_COLLECTION}" PYWB_COLLECTION
+Check_Set "${PYWB_HDFSMNT}" PYWB_HDFSMNT
+
+Check_Executable 'hadoop-fuse-dfs'
+Check_Executable 'ln'
+Check_Executable 'nc'
+Check_Set "${LOCKSS_HDFS_HOST}" LOCKSS_HDFS_HOST
+Check_Set "${LOCKSS_HDFS_FS_PORT}" LOCKSS_HDFS_FS_PORT
+Check_Set "${LOCKSS_REPO_BASEDIR}" LOCKSS_REPO_BASEDIR
+
+mkdir -p "${PYWB_HDFSMNT}"
+Check_Dir "${PYWB_HDFSMNT}"
+
+# Wait for HDFS to become available
+echo -n " * Waiting for ${LOCKSS_HDFS_HOST}:${LOCKSS_HDFS_FS_PORT}: ."
+while ! nc -z "${LOCKSS_HDFS_HOST}" "${LOCKSS_HDFS_FS_PORT}" ; do
+  sleep 1
+  echo -n '.'
+done
+echo
+
+DFS_URL="dfs://${LOCKSS_HDFS_HOST}:${LOCKSS_HDFS_FS_PORT}/"
+echo " * Mounting ${DFS_URL} to ${PYWB_HDFSMNT}"
+hadoop-fuse-dfs "${DFS_URL}" ${PYWB_HDFSMNT}
+if [ "$?" != "0" ]; then
+  echo "${_0}: mount failed: ${DFS_URL}"
+  exit 1
+fi
+
+# Ensure the sealed directory exists under HDFS
+# Note: -p doesn't work under Fuse HDFS, used so mkdir is quiet
+PYWB_WATCHDIR_PARENT="${PYWB_HDFSMNT}/${LOCKSS_REPO_BASEDIR}"
+mkdir -p "${PYWB_WATCHDIR_PARENT}"
+PYWB_WATCHDIR="${PYWB_WATCHDIR_PARENT}/sealed"
+mkdir -p "${PYWB_WATCHDIR}"
+
+ln -s -f ${PYWB_WATCHDIR} ${PYWB_DATA}/collections/${PYWB_COLLECTION}/archive
+
+Check_Dir "${VOLUME_DIR}"
+export INIT_COLLECTION="${LOCKSS_PYWB_COLLECTION}"
+
+# Invoke (exec) the original webrecorder/pywb entrypoint; TODO: $@ ?
+exec "${VOLUME_DIR}/docker-entrypoint.sh" uwsgi /uwsgi/uwsgi.ini
