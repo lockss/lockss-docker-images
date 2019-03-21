@@ -28,6 +28,4 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 org.lockss.platform.diskSpacePaths=${LOCKSS_DATA}
-org.lockss.platform.tmpDir=/tmp
-org.lockss.platform.logdirectory=${LOCKSS_LOGS}
-org.lockss.platform.logfile=daemon
+org.lockss.platform.tmpDir=${LOCKSS_TMP}

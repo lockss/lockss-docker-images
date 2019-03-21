@@ -30,7 +30,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 ROOT_DIR="$(realpath "$(dirname "${0}")/..")"
-TAG='lockss/lockss-spring:2.0'
+TAG='lockss/lockss-spring:2.1'
 
 docker build --tag "${TAG}" "${ROOT_DIR}" \
 && [ "${1}" = "--push" ] \

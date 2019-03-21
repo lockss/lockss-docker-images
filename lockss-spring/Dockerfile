@@ -27,7 +27,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-alpine:3.9
+FROM lockss/lockss-alpine:3.9-2
 
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
 
@@ -59,6 +59,7 @@ ENV CONFIGS=/run/configs \
     LOCKSS_HOME=/usr/local/share/lockss \
     LOCKSS_PIDS=/var/run \
     LOCKSS_DATA=/data \
+    LOCKSS_TMP=/data/temp \
     LOCKSS_LOGS=/var/log/lockss
 
 RUN ipm-update \

@@ -32,7 +32,7 @@
 _0="$(basename "${0}")"
 
 JVM_OPTS_DOCKER='-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap'
-JVM_OPTS_LOGGING='-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -Dorg.springframework.boot.logging.LoggingSystem=none'
+JVM_OPTS_LOGGING='-Dorg.lockss.defaultLogLevel=debug -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -Dorg.springframework.boot.logging.LoggingSystem=none'
 LOCKSS_JAR="${LOCKSS_HOME}/lib/lockss.jar"
 
 Apply_Config()
@@ -104,6 +104,8 @@ Check_Dir "${LOCKSS_HOME}"
 Check_Set "${LOCKSS_JAR}" LOCKSS_JAR
 Check_File "${LOCKSS_JAR}"
 
+Check_Set "${LOCKSS_TMP}" LOCKSS_TMP
+
 mkdir -p "${LOCKSS_HOME}/etc"
 Apply_Config "${LOCKSS_HOME}/etc.base"
 
@@ -121,6 +123,14 @@ fi
 
 Check_File "${CONFIGS}/service_config"
 ARGS_SERVICE="-p ${LOCKSS_HOME}/etc/lockss_service_base -p ${CONFIGS}/lockss_service -p ${CONFIGS}/lockss_service_opt"
+
+# Temp directory handling
+OLDTMP="$(mktemp -d -p "${LOCKSS_DATA}")"
+mv "${LOCKSS_TMP}" "${OLDTMP}"
+mkdir -p "${LOCKSS_TMP}"
+( cd "${OLDTMP}" && rm -rf * && rmdir "${OLDTMP}" ) &
+
+export LOG4J_LOCKSS_CONFIG="${LOCKSS_HOME}/etc/log4j2-lockss-container.xml"
 
 echo "$$" > "${LOCKSS_PIDS}/lockss.pid"
 exec java ${JVM_OPTS_DOCKER} \
