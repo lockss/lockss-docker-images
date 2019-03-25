@@ -27,7 +27,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-alpine:3.9-2
+FROM lockss/lockss-alpine:3.9.2-1
 
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
 
@@ -54,7 +54,11 @@ ONBUILD ENV LOCKSS_MAVEN_GROUP="${LOCKSS_MAVEN_GROUP}" \
 ONBUILD EXPOSE ${LOCKSS_REST_PORT} ${LOCKSS_UI_PORT}
 
 # Environment variables
-ENV CONFIGS=/run/configs \
+ENV LOCKSS_WAIT_FOR_PORT_TIMEOUT=2 \
+    LOCKSS_WAIT_FOR_PORT_SLEEP=2 \
+    LOCKSS_WAIT_FOR_200_TIMEOUT=2 \
+    LOCKSS_WAIT_FOR_200_SLEEP=2 \
+    CONFIGS=/run/configs \
     SECRETS=/run/secrets \
     LOCKSS_HOME=/usr/local/share/lockss \
     LOCKSS_PIDS=/var/run \
@@ -63,7 +67,8 @@ ENV CONFIGS=/run/configs \
     LOCKSS_LOGS=/var/log/lockss
 
 RUN ipm-update \
- && ipm-install gettext \
+ && ipm-install curl \
+                gettext \
                 netcat \
                 openjdk8-jre \
  && ipm-clean

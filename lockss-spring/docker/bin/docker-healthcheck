@@ -63,6 +63,11 @@ Check_Set()
   fi
 }
 
+Check_Executable 'curl'
 Check_Executable 'nc'
 Check_Set "${LOCKSS_REST_PORT}" LOCKSS_REST_PORT
-nc -z localhost "${LOCKSS_REST_PORT}" || exit 1
+Check_Dir "${LOCKSS_PIDS}"
+Check_File "${LOCKSS_PIDS}/lockss.pid"
+ps -p "$(cat "${LOCKSS_PIDS}/lockss.pid")" > /dev/null || exit 1
+nc -z -w 10 localhost "${LOCKSS_REST_PORT}" || exit 1
+curl --silent --max-time 10 --location "http://localhost:${LOCKSS_REST_PORT}/status" || exit 1

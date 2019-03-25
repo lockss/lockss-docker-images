@@ -88,12 +88,38 @@ Check_Set()
   fi
 }
 
+# $1=space separated string of host:port pairs
+Wait_For_Port()
+{
+  for hostport in $@ ; do
+    echo " * Waiting for ${hostport}..."
+    host="${hostport%%:*}"
+    port="${hostport#*:}"
+    until nc -z -w "${LOCKSS_WAIT_FOR_PORT_TIMEOUT}" "${host}" "${port}" ; do
+      sleep "${LOCKSS_WAIT_FOR_PORT_SLEEP}"
+    done
+  done
+}
+
+# $1=space separated string of host:port pairs
+Wait_For_200()
+{
+  for hostport in $@ ; do
+    echo " * Waiting for 200 from http://${hostport}/status ..."
+    until curl --silent --max-time "${LOCKSS_WAIT_FOR_200_TIMEOUT}" --location "http://${hostport}/status" ; do
+      sleep "${LOCKSS_WAIT_FOR_200_SLEEP}"
+    done
+  done
+}
+
 # Sanity checks
 
 echo " * Sanity checks..."
 
+Check_Executable 'curl'
 Check_Executable 'envsubst'
 Check_Executable 'java'
+Check_Executable 'nc'
 
 Check_Set "${LOCKSS_LOGS}" LOCKSS_LOGS
 Check_Dir "${LOCKSS_LOGS}"
@@ -130,6 +156,16 @@ fi
 
 Check_File "${CONFIGS}/service_config"
 ARGS_SERVICE="-p ${LOCKSS_HOME}/etc/lockss_service_base -p ${CONFIGS}/lockss_service -p ${CONFIGS}/lockss_service_opt"
+
+# Sequencing
+
+if [ -n "${LOCKSS_WAIT_FOR_PORT}" ]; then
+  Wait_For_Port "${LOCKSS_WAIT_FOR_PORT}"
+fi
+
+if [ -n "${LOCKSS_WAIT_FOR_200}" ]; then
+  Wait_For_200 "${LOCKSS_WAIT_FOR_200}"
+fi
 
 # Temp directory handling
 
