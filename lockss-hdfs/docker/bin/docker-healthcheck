@@ -29,25 +29,16 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-_0="$(basename "${0}")"
-
-STARTUP_FILE="${LOCKSS_PIDS}/hadoop.startup"
-
 if [ -z "${USER}" ] && [ -n "${HOME}" ]; then
   USER="$(basename "${HOME}")"
 fi
-
 HADOOP_PID_NN="${HADOOP_PIDS}/hadoop-${USER}-namenode.pid"
 HADOOP_PID_DN="${HADOOP_PIDS}/hadoop-${USER}-datanode.pid"
 HADOOP_PID_SNN="${HADOOP_PIDS}/hadoop-${USER}-secondarynamenode.pid"
 
-# Okay if still starting up
-if [ -f "${STARTUP_FILE}" ] && kill -0 "$(cat "${STARTUP_FILE}")" 2> /dev/null ; then
-  exit 0
+if ! kill -0 1 2> /dev/null ; then
+  for f in "${HADOOP_PID_NN}" "${HADOOP_PID_DN}" "${HADOOP_PID_SNN}"; do
+    [ -f "${f}" ] || exit 1
+    kill -0 "$(cat "${f}")" 2> /dev/null || exit 1
+  done
 fi
-
-# If running, check health
-for f in "${HADOOP_PID_NN}" "${HADOOP_PID_DN}" "${HADOOP_PID_SNN}"; do
-  [ -f "${f}" ] || exit 1
-  kill -0 "$(cat "${f}")" 2> /dev/null || exit 1
-done
