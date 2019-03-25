@@ -112,3 +112,8 @@ fi
 echo " * Launching..."
 "${HADOOP_HOME}/sbin/start-dfs.sh"
 rm -f "${STARTUP_FILE}"
+
+echo " * Finishing entry point..."
+echo "PIDs:"
+cat "${HADOOP_PIDS}"/*.pid
+tail -f /dev/null
