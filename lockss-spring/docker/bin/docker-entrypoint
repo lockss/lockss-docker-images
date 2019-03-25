@@ -135,6 +135,10 @@ Check_File "${LOCKSS_JAR}"
 
 Check_Set "${LOCKSS_TMP}" LOCKSS_TMP
 
+# Beginning
+
+echo " * Beginning execution with ${LOCKSS_MAVEN_GROUP}:${LOCKSS_MAVEN_ARTIFACT}:${LOCKSS_MAVEN_VERSION}"
+
 # Layer configuration
 
 echo " * Layering configuration..."
