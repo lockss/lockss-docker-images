@@ -72,11 +72,11 @@ Check_Set "${LOCKSS_REST_PORT}" LOCKSS_REST_PORT
 Check_Dir "${LOCKSS_PIDS}"
 
 # Okay if still starting up
-if [ -f "${STARTUP_FILE}" ] && ps -p "$(cat "${STARTUP_FILE}")" > /dev/null ; then
+if [ -f "${STARTUP_FILE}" ] && kill -0 "$(cat "${STARTUP_FILE}")" 2> /dev/null ; then
   exit 0
 fi
 
 # If running, check health
-ps -p "$(cat "${PID_FILE}")" > /dev/null || exit 1
+kill -0 "$(cat "${PID_FILE}")" 2> /dev/null || exit 1
 nc -z -w 10 localhost "${LOCKSS_REST_PORT}" || exit 1
 curl --silent --max-time 10 --location "http://localhost:${LOCKSS_REST_PORT}/status" || exit 1
