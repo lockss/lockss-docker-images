@@ -31,7 +31,7 @@
 
 _0="$(basename "${0}")"
 
-STARTUP_FILE="${LOCKSS_PIDS}/lockss.startup"
+STARTUP_FILE="${LOCKSS_PIDS}/hadoop.startup"
 
 if [ -z "${USER}" ] && [ -n "${HOME}" ]; then
   USER="$(basename "${HOME}")"
@@ -42,12 +42,12 @@ HADOOP_PID_DN="${HADOOP_PIDS}/hadoop-${USER}-datanode.pid"
 HADOOP_PID_SNN="${HADOOP_PIDS}/hadoop-${USER}-secondarynamenode.pid"
 
 # Okay if still starting up
-if [ -f "${STARTUP_FILE}" ] && ps -p "$(cat "${STARTUP_FILE}")" > /dev/null ; then
+if [ -f "${STARTUP_FILE}" ] && kill -0 "$(cat "${STARTUP_FILE}")" 2> /dev/null ; then
   exit 0
 fi
 
 # If running, check health
 for f in "${HADOOP_PID_NN}" "${HADOOP_PID_DN}" "${HADOOP_PID_SNN}"; do
   [ -f "${f}" ] || exit 1
-  ps -p "$(cat "${f}")" > /dev/null || exit 1
+  kill -0 "$(cat "${f}")" 2> /dev/null || exit 1
 done

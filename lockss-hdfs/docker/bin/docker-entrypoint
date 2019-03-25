@@ -31,7 +31,7 @@
 
 _0="$(basename "${0}")"
 
-STARTUP_FILE="${HADOOP_PIDS}/lockss.startup"
+STARTUP_FILE="${HADOOP_PIDS}/hadoop.startup"
 
 # $1=exitcode
 Exit()
@@ -115,5 +115,5 @@ rm -f "${STARTUP_FILE}"
 
 echo " * Finishing entry point..."
 echo "PIDs:"
-cat "${HADOOP_PIDS}"/*.pid
+cat "${HADOOP_PIDS}"/hadoop-*.pid
 tail -f /dev/null
