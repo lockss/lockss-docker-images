@@ -30,9 +30,11 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 ROOT_DIR="$(realpath "$(dirname "${0}")/..")"
+TAG_FILE="${ROOT_DIR}/VERSION"
+TAG="lockss/lockss-hdfs:$(cat "${TAG_FILE}")"
+
 DOWNLOAD="${ROOT_DIR}/download"
 TEMP="${ROOT_DIR}/docker/temp"
-TAG='lockss/lockss-hdfs:1.1'
 
 HADOOP_VERSION='3.0.3'
 HADOOP_URL="https://archive.apache.org/dist/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz"
@@ -44,4 +46,6 @@ mkdir --parents "${DOWNLOAD}" "${TEMP}" \
 && cp "${HADOOP_DOWNLOAD}" "${HADOOP_FILE}" \
 && docker build --tag "${TAG}" "${ROOT_DIR}" \
 && [ "${1}" = '--push' ] \
-&& docker push "${TAG}"
+&& if [ "${1}" = "--push" ]; then
+     docker push "${TAG}"
+   fi
