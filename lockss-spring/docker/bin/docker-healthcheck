@@ -71,11 +71,6 @@ Check_Executable 'nc'
 Check_Set "${LOCKSS_REST_PORT}" LOCKSS_REST_PORT
 Check_Dir "${LOCKSS_PIDS}"
 
-# Not okay if neither still starting up nor running
-if [ ! -f "${STARTUP_FILE}" ] && [ ! -f "${PID_FILE}" ]; then
-  exit 1
-fi
-
 # Okay if still starting up
 if [ -f "${STARTUP_FILE}" ] && ps -p "$(cat "${STARTUP_FILE}")" > /dev/null ; then
   exit 0
