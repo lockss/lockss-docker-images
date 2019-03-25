@@ -169,7 +169,7 @@ else
   ARGS_CLUSTER="-c ${LOCKSS_CONFIG_URL} -l ${LOCKSS_CONFIG_URL}/config/file/cluster"
 fi
 
-Check_File "${CONFIGS}/service_config"
+Check_File "${CONFIGS}/lockss_service"
 ARGS_SERVICE="-p ${LOCKSS_HOME}/etc/lockss_service_base -p ${CONFIGS}/lockss_service -p ${CONFIGS}/lockss_service_opt"
 
 # Sequencing
