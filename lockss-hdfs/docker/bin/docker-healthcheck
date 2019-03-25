@@ -29,6 +29,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+STARTUP_FILE="${HADOOP_PIDS}/hadoop.startup"
+
 if [ -z "${USER}" ] && [ -n "${HOME}" ]; then
   USER="$(basename "${HOME}")"
 fi
@@ -36,7 +38,9 @@ HADOOP_PID_NN="${HADOOP_PIDS}/hadoop-${USER}-namenode.pid"
 HADOOP_PID_DN="${HADOOP_PIDS}/hadoop-${USER}-datanode.pid"
 HADOOP_PID_SNN="${HADOOP_PIDS}/hadoop-${USER}-secondarynamenode.pid"
 
-if ! kill -0 1 2> /dev/null ; then
+if [ -f "${STARTUP_FILE}" ]; then
+  kill -0 1 2> /dev/null || exit 1
+else
   for f in "${HADOOP_PID_NN}" "${HADOOP_PID_DN}" "${HADOOP_PID_SNN}"; do
     [ -f "${f}" ] || exit 1
     kill -0 "$(cat "${f}")" 2> /dev/null || exit 1
