@@ -30,8 +30,10 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 ROOT_DIR="$(realpath "$(dirname "${0}")/..")"
-TAG='lockss/lockss-alpine:3.9-2'
+TAG_FILE="${ROOT_DIR}/VERSION"
+TAG="lockss/lockss-alpine:$(cat "${TAG_FILE}")"
 
 docker build --tag "${TAG}" "${ROOT_DIR}" \
-&& [ "${1}" = "--push" ] \
-&& docker push "${TAG}"
+&& if [ "${1}" = "--push" ]; then
+     docker push "${TAG}"
+   fi

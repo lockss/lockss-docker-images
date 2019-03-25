@@ -29,7 +29,7 @@
 
 FROM lockss/lockss-ipm:2.1 AS lockss-ipm
 
-FROM debian:stretch-20190228
+FROM debian:stretch-20190228-slim
 
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
 

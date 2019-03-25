@@ -29,7 +29,7 @@
 
 FROM lockss/lockss-ipm:2.1 AS lockss-ipm
 
-FROM ubuntu:xenial-20190122
+FROM ubuntu:xenial-20190222
 
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
 
