@@ -32,6 +32,7 @@
 _0="$(basename "${0}")"
 
 STARTUP_FILE="${HADOOP_PIDS}/hadoop.startup"
+CHILD_PID=''
 
 # $1=exitcode
 Exit()
@@ -76,6 +77,18 @@ Check_Executable()
   fi
 }
 
+# Traps
+
+# $1=sigval (integer)
+Trap()
+{
+  kill -$1 $CHILD_PID "${HADOOP_PIDS}/hadoop-"*.pid
+  exit $1
+}
+
+trap 'Trap 9' SIGKILL
+trap 'Trap 15' SIGTERM
+
 # Beginning
 
 echo "$$" > "${STARTUP_FILE}"
@@ -94,7 +107,10 @@ Check_Dir "${HADOOP_DATA}"
 # SSH server
 
 echo " * Launching SSH server..."
-lockss-hdfs-launch-sshd || Exit 1
+lockss-hdfs-launch-sshd &
+CHILD_PID=$!
+wait $! || Exit 1
+CHILD_PID=''
 
 # Layering configuration
 
@@ -110,10 +126,13 @@ if [ ! -f "${HADOOP_DATA}/dfs/name/current/VERSION" ]; then
 fi
 
 echo " * Launching..."
-"${HADOOP_HOME}/sbin/start-dfs.sh"
+"${HADOOP_HOME}/sbin/start-dfs.sh" &
+CHILD_PID=$!
+wait $!
+CHILD_PID=''
 rm -f "${STARTUP_FILE}"
 
 echo " * Finishing entry point..."
 echo "PIDs:"
-cat "${HADOOP_PIDS}"/hadoop-*.pid
+cat "${HADOOP_PIDS}/hadoop-"*.pid
 tail -f /dev/null
