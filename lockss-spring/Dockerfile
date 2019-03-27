@@ -79,5 +79,5 @@ HEALTHCHECK --retries=1 --start-period=60s CMD ["/usr/local/bin/docker-healthche
 
 COPY /docker/bin/* /usr/local/bin/
 COPY /docker/lockss/etc.base/* "${LOCKSS_HOME}/etc.base/"
-ONBUILD COPY /docker/lockss/etc.base/lockss_service_base.tpl "${LOCKSS_HOME}/etc.base/"
+ONBUILD COPY /docker/lockss/etc.base/* "${LOCKSS_HOME}/etc.base/"
 ONBUILD COPY /target/current-with-deps.jar "${LOCKSS_HOME}/lib/lockss.jar"

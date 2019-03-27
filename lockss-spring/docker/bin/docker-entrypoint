@@ -47,6 +47,7 @@ Exit()
 
 Apply_Config()
 {
+  echo "$(date) Applying config from ${1}..."
   if [ -d "${1}" ]; then
     : \
     && TMP=$(mktemp -d) \
@@ -59,8 +60,10 @@ Apply_Config()
     && ( cd "${TMP}" && tar cf - --exclude '*.tpl' . ) | tar xf -
     RET=$?
     rm -rf "${TMP}"
+    echo "$(date) Done applying config from ${1}."
     return $RET
   else
+    echo "$(date) No config directory ${1}."
     return 0
   fi
 }
@@ -100,43 +103,46 @@ Check_Set()
 # $1=space separated string of host:port pairs
 Wait_For_Port()
 {
-  echo " * Waiting for: $@"
+  echo "$(date) Starting wait for port on: $@"
   for hostport in $@ ; do
-    echo " * Waiting for ${hostport} since $(date)"
+    echo "$(date) Waiting for port on ${hostport}..."
     host="${hostport%%:*}"
     port="${hostport#*:}"
     until nc -z -w "${LOCKSS_WAIT_FOR_PORT_TIMEOUT}" "${host}" "${port}" ; do
       sleep "${LOCKSS_WAIT_FOR_PORT_SLEEP}"
     done
-    echo " * ...done at $(date)"
+    echo "$(date) Done waiting for port on ${hostport}."
   done
-  echo " * ...done"  
+  echo "$(date) Done waiting for ports."
 }
 
 # $1=space separated string of host:port pairs
 Wait_For_200()
 {
-  echo " * Waiting for 200 from: $@"
+  echo "$(date) Starting wait for HTTP 200 responses from: $@"
   for hostport in $@ ; do
     url="http://${hostport}/status"
-    echo " * Waiting for 200 from ${url} since $(date)"
+    echo "$(date) Waiting for HTTP 200 response from ${url}..."
     until curl --silent --max-time "${LOCKSS_WAIT_FOR_200_TIMEOUT}" --location "${url}" ; do
       sleep "${LOCKSS_WAIT_FOR_200_SLEEP}"
     done
-    echo " * ...done at $(date)"
+    echo "$(date) Done waiting for HTTP 200 response from ${url}."
   done
-  echo " * ...done"  
+  echo "$(date) Done waiting for HTTP 200 responses."
 }
 
 # Beginning
 
 echo "$$" > "${STARTUP_FILE}"
 rm -f "${PID_FILE}"
-echo " * Beginning execution with ${LOCKSS_MAVEN_GROUP}:${LOCKSS_MAVEN_ARTIFACT}:${LOCKSS_MAVEN_VERSION}"
+echo "$(date) Beginning execution..."
+echo "$(date) Maven coordinates: ${LOCKSS_MAVEN_GROUP}:${LOCKSS_MAVEN_ARTIFACT}:${LOCKSS_MAVEN_VERSION}"
+echo "$(date) Environment:"
+env
 
 # Sanity checks
 
-echo " * Sanity checks..."
+echo "$(date) Sanity checks..."
 
 Check_Executable 'curl'
 Check_Executable 'date'
@@ -160,25 +166,64 @@ Check_Set "${LOCKSS_TMP}" LOCKSS_TMP
 
 # Layer configuration
 
-echo " * Layering configuration..."
-
+echo "$(date) Layering configuration..."
 mkdir -p "${LOCKSS_HOME}/etc"
 Apply_Config "${LOCKSS_HOME}/etc.base"
+echo "$(date) Done layering configuration."
 
-Check_File "${CONFIGS}/lockss_bootstrap"
-ARGS_BOOTSTRAP="-b ${LOCKSS_HOME}/etc/lockss_bootstrap_base -b ${CONFIGS}/lockss_bootstrap"
+# Relevant if LOCKSS_IS_REPO
+JVM_OPTS_REPO=''
+ARGS_REPO=''
+# Relevant if !LOCKSS_IS_REPO
+ARGS_BOOTSTRAP=''
+ARGS_CLUSTER=''
+ARGS_SERVICE=''
+if [ "${LOCKSS_IS_REPO}" = 'true' ]; then
 
-if [ "${LOCKSS_IS_CONFIG}" = 'true' ]; then
-  Check_Set "${LOCKSS_PROPS_URL}" LOCKSS_PROPS_URL
-  Check_File "${CONFIGS}/lockss_cluster"
-  ARGS_CLUSTER="-l ${CONFIGS}/lockss_cluster -p ${LOCKSS_PROPS_URL}"
+  #
+  # LOCKSS_IS_REPO
+  #
+  echo "$(date) Repository service configuration..."
+  JVM_OPTS_REPO="-Dorg.lockss.jmsUri=tcp://${LOCKSS_JMS_HOST}:${LOCKSS_JMS_PORT}"
+  ARGS_REPO="--spring.config.location=file:${CONFIGS}/lockss.properties"
+
 else
-  Check_Set "${LOCKSS_CONFIG_URL}" CFG_URL
-  ARGS_CLUSTER="-c ${LOCKSS_CONFIG_URL} -l ${LOCKSS_CONFIG_URL}/config/file/cluster"
-fi
 
-Check_File "${CONFIGS}/lockss_service"
-ARGS_SERVICE="-p ${LOCKSS_HOME}/etc/lockss_service_base -p ${CONFIGS}/lockss_service -p ${CONFIGS}/lockss_service_opt"
+  #
+  # !LOCKSS_IS_REPO
+  #
+
+  # Bootstrap configuration
+
+  echo "$(date) Bootstrap configuration..."
+  Check_File "${CONFIGS}/lockss_bootstrap"
+  ARGS_BOOTSTRAP="-b ${LOCKSS_HOME}/etc/lockss_bootstrap_base -b ${CONFIGS}/lockss_bootstrap"
+
+  # Cluster configuration
+
+  echo "$(date) Cluster configuration..."  
+  if [ "${LOCKSS_IS_CONFIG}" = 'true' ]; then
+    #
+    # !LOCKSS_IS_REPO and LOCKSS_IS_CONFIG
+    #
+    Check_Set "${LOCKSS_PROPS_URL}" LOCKSS_PROPS_URL
+    Check_File "${CONFIGS}/lockss_cluster"
+    ARGS_CLUSTER="-l ${CONFIGS}/lockss_cluster -p ${LOCKSS_PROPS_URL}"
+  else
+    #
+    # !LOCKSS_IS_REPO and LOCKSS_IS_CONFIG
+    #
+    Check_Set "${LOCKSS_CONFIG_URL}" CFG_URL
+    ARGS_CLUSTER="-c ${LOCKSS_CONFIG_URL} -l ${LOCKSS_CONFIG_URL}/config/file/cluster"
+  fi
+
+  # Service configuration
+
+  echo "$(date) Service configuration..."
+  Check_File "${CONFIGS}/lockss_service"
+  ARGS_SERVICE="-p ${LOCKSS_HOME}/etc/lockss_service_base -p ${CONFIGS}/lockss_service -p ${CONFIGS}/lockss_service_opt"
+
+fi
 
 # Sequencing
 
@@ -192,7 +237,7 @@ fi
 
 # Temp directory handling
 
-echo " * Temporary directory handling..."
+echo "$(date) Temporary directory handling..."
 OLDTMP="$(mktemp -d -p "${LOCKSS_DATA}")"
 mv "${LOCKSS_TMP}" "${OLDTMP}"
 mkdir -p "${LOCKSS_TMP}"
@@ -200,13 +245,26 @@ mkdir -p "${LOCKSS_TMP}"
 
 export LOG4J_LOCKSS_CONFIG="${LOCKSS_HOME}/etc/log4j2-lockss-container.xml"
 
-echo " * Launching service..."
+# Launch service
+
+echo "$(date) Launching service..."
+echo "$(date) Launch parameters:"
+echo "JVM_OPTS_DOCKER=${JVM_OPTS_DOCKER}"
+echo "JVM_OPTS_LOGGING=${JVM_OPTS_LOGGING}"
+echo "JVM_OPTS_TMP=${JVM_OPTS_TMP}"
+echo "JVM_OPTS_REPO=${JVM_OPTS_REPO}"
+echo "ARGS_BOOTSTRAP=${ARGS_BOOTSTRAP}"
+echo "ARGS_CLUSTER=${ARGS_CLUSTER}"
+echo "ARGS_SERVICE=${ARGS_SERVICE}"
+echo "ARGS_REPO=${ARGS_REPO}"
 echo "$$" > "${PID_FILE}"
 rm -f "${STARTUP_FILE}"
 exec java ${JVM_OPTS_DOCKER} \
           ${JVM_OPTS_LOGGING} \
           ${JVM_OPTS_TMP} \
+          ${JVM_OPTS_REPO} \
           -jar "${LOCKSS_JAR}" \
           ${ARGS_BOOTSTRAP} \
           ${ARGS_CLUSTER} \
-          ${ARGS_SERVICE}
+          ${ARGS_SERVICE} \
+          ${ARGS_REPO}
