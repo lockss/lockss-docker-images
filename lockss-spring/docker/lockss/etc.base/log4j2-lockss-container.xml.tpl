@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 
 Copyright (c) 2000-2019, Board of Trustees of Leland Stanford Jr. University
@@ -32,8 +31,18 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 
 -->
-
 <Configuration>
+
+  <Properties>
+
+    <!-- store to /var/log/lockss/daemon.log -->
     <Property name="log.dir">${LOCKSS_LOGS}</Property>
     <Property name="log.file">daemon</Property>
+
+    <!-- roll over into five 100MB files -->
+    <Property name="log.rollingfile.sizetrigger">100 MB</Property>
+    <Property name="log.rollingfile.maxrollover">5</Property>
+
+  </Properties>
+
 </Configuration>
