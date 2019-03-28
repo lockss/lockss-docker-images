@@ -135,6 +135,7 @@ Wait_For_200()
 
 echo "$$" > "${STARTUP_FILE}"
 rm -f "${PID_FILE}"
+echo "$(date) *************** CONTAINER ENTRY POINT ***************"
 echo "$(date) Beginning execution..."
 echo "$(date) Maven coordinates: ${LOCKSS_MAVEN_GROUP}:${LOCKSS_MAVEN_ARTIFACT}:${LOCKSS_MAVEN_VERSION}"
 echo "$(date) Environment:"
@@ -249,6 +250,8 @@ export LOG4J_LOCKSS_CONFIG="${LOCKSS_HOME}/etc/log4j2-lockss-container.xml"
 
 echo "$(date) Launching service..."
 echo "$(date) Launch parameters:"
+java -version
+echo "JAVA_HOME=${JAVA_HOME}"
 echo "JVM_OPTS_DOCKER=${JVM_OPTS_DOCKER}"
 echo "JVM_OPTS_LOGGING=${JVM_OPTS_LOGGING}"
 echo "JVM_OPTS_TMP=${JVM_OPTS_TMP}"
@@ -257,6 +260,7 @@ echo "ARGS_BOOTSTRAP=${ARGS_BOOTSTRAP}"
 echo "ARGS_CLUSTER=${ARGS_CLUSTER}"
 echo "ARGS_SERVICE=${ARGS_SERVICE}"
 echo "ARGS_REPO=${ARGS_REPO}"
+echo "$(date) *************** JVM INVOCATION ***************"
 echo "$$" > "${PID_FILE}"
 rm -f "${STARTUP_FILE}"
 exec java ${JVM_OPTS_DOCKER} \
