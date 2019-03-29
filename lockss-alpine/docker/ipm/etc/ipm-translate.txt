@@ -18,8 +18,8 @@ lynx	lynx
 mtr	mtr
 nano	nano
 netcat	busybox
-openjdk8	openjdk8
-openjdk8-jre	openjdk8-jre
+openjdk8	openjdk8 nss
+openjdk8-jre	openjdk8-jre nss
 openssh-client	openssh-client
 openssh-server	openssh-server
 pdsh	pdsh
