@@ -32,7 +32,8 @@
 _0="$(basename "${0}")"
 
 STARTUP_FILE="${HADOOP_PIDS}/hadoop.startup"
-CHILD_PID=''
+
+SUBPID=''
 
 # $1=exitcode
 Exit()
@@ -44,6 +45,7 @@ Exit()
 
 Apply_Config()
 {
+  echo "$(date) Applying config from ${1}..."
   if [ -d "${1}" ]; then
     : \
     && TMP=$(mktemp -d) \
@@ -56,8 +58,10 @@ Apply_Config()
     && ( cd "${TMP}" && tar cf - --exclude '*.tpl' . ) | tar xf -
     RET=$?
     rm -rf "${TMP}"
+    echo "$(date) Done applying config from ${1}."
     return $RET
   else
+    echo "$(date) No config directory ${1}."
     return 0
   fi
 }
@@ -72,34 +76,62 @@ Check_Dir()
 
 Check_Executable()
 {
-  if ! which "${1}" > /dev/null 2>&1 ; then
-    echo "${_0}: ${1} not on the PATH"
+  if ! command -v "${1}" > /dev/null 2>&1 ; then
+    echo "${_0}: ${1} not on the PATH (${PATH})"
     Exit 1
   fi
 }
 
-# Traps
-
-# $1=sigval (integer)
-Trap()
+Trap_TERM()
 {
-  echo " * Received signal ${1}..."
-  kill -$1 $CHILD_PID "${HADOOP_PIDS}/hadoop-"*.pid
-  Exit $1
+  echo "$(date) Signal caught: TERM"
+  trap - TERM
+  for f in "${HADOOP_PIDS}/hadoop-"*.pid ; do
+    if [ -f "${f}" ]; then
+      p="$(cat "${f}")"
+      echo "$(date) Sending TERM to ${p} (${f})"
+      kill -TERM "${p}"
+      echo "$(date) Waiting for ${p}..."
+      while kill -0 "${p}" 2> /dev/null ; do sleep 0.5 ; done
+      echo "$(date) Done waiting for ${p}."
+    fi
+  done
+  if [ -n "${SUBPID}" ]; then
+    echo "$(date) Sending TERM to ${SUBPID} (background)"  
+    kill -TERM "${SUBPID}"
+    echo "$(date) Waiting for ${SUBPID}..."
+    wait "${SUBPID}"
+    echo "$(date) Done waiting for ${SUBPID}."
+  fi
+  echo "$(date) Sending TERM to $$ (self)"
+  kill -TERM $$
 }
 
-trap 'Trap 9' SIGKILL
-trap 'Trap 15' SIGTERM
+# Use USR1 to cause ps to run
+Trap_USR1()
+{
+  echo "$(date) Signal caught: USR1"
+  ps
+}
+
+
+trap 'Trap_TERM' TERM
+trap 'Trap_USR1' USR1
 
 # Beginning
 
 echo "$$" > "${STARTUP_FILE}"
-echo " * Beginning execution..."
+rm -f "${HADOOP_PIDS}/hadoop-"*.pid
+echo "$(date) *************** CONTAINER ENTRY POINT ***************"
+echo "$(date) Beginning execution..."
+echo "$(date) Environment:"
+env
 
 # Sanity checks
 
-echo " * Sanity checks..."
+echo "$(date) Sanity checks..."
 
+Check_Executable 'date'
 Check_Executable 'envsubst'
 Check_Executable 'lockss-hdfs-launch-sshd'
 
@@ -108,33 +140,50 @@ Check_Dir "${HADOOP_DATA}"
 
 # SSH server
 
-echo " * Launching SSH server..."
+echo "$(date) Launching SSH server..."
 lockss-hdfs-launch-sshd &
-CHILD_PID=$!
-wait $! || Exit 1
-CHILD_PID=''
+SUBPID=$!
+wait "${SUBPID}" || Exit 1
+SUBPID=''
+echo "$(date) Done launching SSH server."
 
 # Layering configuration
 
-echo " * Layering configuration..."
+echo "$(date) Layering configuration..."
 mkdir -p "${HADOOP_HOME}/etc/hadoop"
 Apply_Config "${HADOOP_HOME}/etc.orig/hadoop" || Exit 1
 Apply_Config "${HADOOP_HOME}/etc.base/hadoop" || Exit 1
 Apply_Config "${HADOOP_CONF}" || Exit 1
+echo "$(date) Done layering configuration."
+
+# Maybe format namenode
 
 if [ ! -f "${HADOOP_DATA}/dfs/name/current/VERSION" ]; then
-  echo " * Formatting HDFS namenode..."
+  echo "$(date) Formatting HDFS namenode..."
   ( yes n | "${HADOOP_HOME}/bin/hdfs" namenode -format )
+else
+  echo "$(date) Not Formatting HDFS namenode"
 fi
 
-echo " * Launching..."
+# Launch
+
+echo "$(date) *************** LAUNCH ***************"
+java -version
 "${HADOOP_HOME}/sbin/start-dfs.sh" &
-CHILD_PID=$!
-wait $!
-CHILD_PID=''
+SUBPID=$!
+wait "${SUBPID}" || Exit 1
+SUBPID=''
+echo "$(date) Done launching."
+
 rm -f "${STARTUP_FILE}"
 
-echo " * Finishing entry point..."
-echo "PIDs:"
+echo "$(date) Finishing entry point..."
+echo "$(date) PIDs:"
 cat "${HADOOP_PIDS}/hadoop-"*.pid
-tail -f /dev/null
+
+while true ; do
+  tail -f /dev/null &
+  SUBPID=$!
+  wait "${SUBPID}"
+  SUBPID=''
+done
