@@ -33,7 +33,13 @@ ROOT_DIR="$(realpath "$(dirname "${0}")/..")"
 TAG_FILE="${ROOT_DIR}/VERSION"
 TAG="lockss/lockss-centos:$(cat "${TAG_FILE}")"
 
-docker build --tag "${TAG}" "${ROOT_DIR}" \
-&& if [ "${1}" = "--push" ]; then
+PUSH=''
+if [ "${1}" == '--push' ]; then
+  PUSH='true'
+  shift
+fi
+
+docker build --tag "${TAG}" "$@" "${ROOT_DIR}" \
+&& if [ -n "${PUSH}" ]; then
      docker push "${TAG}"
    fi
