@@ -212,7 +212,7 @@ else
     ARGS_CLUSTER=" -l ${LOCKSS_PROPS_URL} -l ${CONFIGS}/lockss_cluster"
   else
     #
-    # !LOCKSS_IS_REPO and LOCKSS_IS_CONFIG
+    # !LOCKSS_IS_REPO and !LOCKSS_IS_CONFIG
     #
     Check_Set "${LOCKSS_CONFIG_URL}" CFG_URL
     ARGS_CLUSTER="-c ${LOCKSS_CONFIG_URL} -l ${LOCKSS_CONFIG_URL}/config/file/cluster"
