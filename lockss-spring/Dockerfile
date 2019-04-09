@@ -29,27 +29,85 @@
 
 FROM lockss/lockss-alpine:3.9.2-2
 
-MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
+#
+# MANDATORY BUILD ARGUMENTS (CHILD)
+#
 
-# Mandatory build arguments (child)
-ONBUILD ARG LOCKSS_MAVEN_GROUP
-ONBUILD ARG LOCKSS_MAVEN_ARTIFACT
-ONBUILD ARG LOCKSS_MAVEN_VERSION
+ONBUILD ARG LABEL_BUILD_DATE
+ONBUILD ARG LABEL_DESCRIPTION
+ONBUILD ARG LABEL_LOCKSS_RELEASE
+ONBUILD ARG LABEL_MAVEN_ARTIFACT
+ONBUILD ARG LABEL_MAVEN_GROUP
+ONBUILD ARG LABEL_MAVEN_VERSION
+ONBUILD ARG LABEL_NAME
+ONBUILD ARG LABEL_URL
+ONBUILD ARG LABEL_VCS_REF
+ONBUILD ARG LABEL_VCS_URL
+ONBUILD ARG LABEL_VENDOR
+ONBUILD ARG LABEL_VERSION
 ONBUILD ARG LOCKSS_REST_PORT
-ONBUILD RUN test -n "${LOCKSS_MAVEN_GROUP}"    || exit 1 \
-         && test -n "${LOCKSS_MAVEN_ARTIFACT}" || exit 2 \
-         && test -n "${LOCKSS_MAVEN_VERSION}"  || exit 3 \
-         && test -n "${LOCKSS_REST_PORT}"      || exit 4
+ONBUILD RUN test -n "${LABEL_BUILD_DATE}"     || exit  1 \
+         && test -n "${LABEL_DESCRIPTION}"    || exit  2 \
+         && test -n "${LABEL_LOCKSS_RELEASE}" || exit  3 \
+         && test -n "${LABEL_MAVEN_ARTIFACT}" || exit  4 \
+         && test -n "${LABEL_MAVEN_GROUP}"    || exit  5 \
+         && test -n "${LABEL_MAVEN_VERSION}"  || exit  6 \
+         && test -n "${LABEL_NAME}"           || exit  7 \
+         && test -n "${LABEL_URL}"            || exit  8 \
+         && test -n "${LABEL_VCS_REF}"        || exit  9 \
+         && test -n "${LABEL_VCS_URL}"        || exit 10 \
+         && test -n "${LABEL_VENDOR}"         || exit 11 \
+         && test -n "${LABEL_VERSION}"        || exit 12 \
+         && test -n "${LOCKSS_REST_PORT}"     || exit 13
 
-# Optional build arguments (child)
+#
+# OPTIONAL BUILD ARGUMENTS (CHILD)
+#
+
 ONBUILD ARG LOCKSS_UI_PORT
 
-# Environment variables (child)
-ONBUILD ENV LOCKSS_MAVEN_GROUP="${LOCKSS_MAVEN_GROUP}" \
-            LOCKSS_MAVEN_ARTIFACT="${LOCKSS_MAVEN_ARTIFACT}" \
-            LOCKSS_MAVEN_VERSION="${LOCKSS_MAVEN_VERSION}" \
+#
+# ENVIRONMENT VARIABLES (CHILD)
+#
+
+ONBUILD ENV LABEL_MAINTAINER="buildmaster@lockss.org" \
+            LABEL_SCHEMA_VERSION="1.0" \
+            \
+            LABEL_BUILD_DATE="${LABEL_BUILD_DATE}" \
+            LABEL_DESCRIPTION="${LABEL_DESCRIPTION}" \
+            LABEL_LOCKSS_RELEASE="${LABEL_LOCKSS_RELEASE}" \
+            LABEL_MAVEN_ARTIFACT="${LABEL_MAVEN_ARTIFACT}" \
+            LABEL_MAVEN_GROUP="${LABEL_MAVEN_GROUP}" \
+            LABEL_MAVEN_VERSION="${LABEL_MAVEN_VERSION}" \
+            LABEL_NAME="${LABEL_NAME}" \
+            LABEL_URL="${LABEL_URL}" \
+            LABEL_VCS_REF="${LABEL_VCS_REF}" \
+            LABEL_VCS_URL="${LABEL_VCS_URL}" \
+            LABEL_VENDOR="${LABEL_VENDOR}" \
+            LABEL_VERSION="${LABEL_VERSION}" \
             LOCKSS_REST_PORT="${LOCKSS_REST_PORT}" \
+            \
             LOCKSS_UI_PORT="${LOCKSS_UI_PORT}"
+
+#
+# LABELS (CHILD)
+#
+
+ONBUILD LABEL maintainer="${LABEL_MAINTAINER}" \
+              org.label-schema.schema-version="${LABEL_SCHEMA_VERSION}" \
+              \
+              org.label-schema.build-date="${LABEL_BUILD_DATE}" \
+              org.label-schema.description="${LABEL_DESCRIPTION}" \
+              org.lockss.label.lockss-release="${LABEL_LOCKSS_RELEASE}" \
+              org.lockss.label.maven-artifact="${LABEL_MAVEN_ARTIFACT}" \
+              org.lockss.label.maven-group="${LABEL_MAVEN_GROUP}" \
+              org.lockss.label.maven-version="${LABEL_MAVEN_VERSION}" \
+              org.label-schema.name="${LABEL_NAME}" \
+              org.label-schema.url="${LABEL_URL}" \
+              org.label-schema.vcs-ref="${LABEL_VCS_REF}" \
+              org.label-schema.vcs-url="${LABEL_VCS_URL}" \
+              org.label-schema.vendor="${LABEL_VENDOR}" \
+              org.label-schema.vcs-version="${LABEL_VERSION}"
 
 ONBUILD EXPOSE ${LOCKSS_REST_PORT} ${LOCKSS_UI_PORT}
 
