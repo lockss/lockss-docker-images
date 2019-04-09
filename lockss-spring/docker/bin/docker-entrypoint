@@ -100,6 +100,24 @@ Check_Set()
   fi
 }
 
+# $1=input
+Url_Encode()
+{
+  echo -n "${1}" | awk '
+    BEGIN {
+      for (i = 0 ; i < 256 ; ++i) {
+        ord[sprintf("%c", i)] = i
+      }
+    }
+    {
+      for (i = 1 ; i <= length($0) ; i++) {
+        c = substr($0, i, 1) ;
+        printf("%s", (c ~ /[-._~a-zA-Z0-9]/) ? c : sprintf("%%%02X", ord[c]))
+      }
+    }
+  '
+}
+
 # $1=space separated string of host:port pairs
 Wait_For_Port()
 {
@@ -137,7 +155,7 @@ echo "$$" > "${STARTUP_FILE}"
 rm -f "${PID_FILE}"
 echo "$(date) *************** CONTAINER ENTRY POINT ***************"
 echo "$(date) Beginning execution..."
-echo "$(date) Maven coordinates: ${LOCKSS_MAVEN_GROUP}:${LOCKSS_MAVEN_ARTIFACT}:${LOCKSS_MAVEN_VERSION}"
+echo "$(date) Maven coordinates: ${LABEL_MAVEN_GROUP}:${LABEL_MAVEN_ARTIFACT}:${LABEL_MAVEN_VERSION}"
 echo "$(date) Environment:"
 env
 
@@ -145,11 +163,17 @@ env
 
 echo "$(date) Sanity checks..."
 
+Check_Executable 'awk'
 Check_Executable 'curl'
 Check_Executable 'date'
 Check_Executable 'envsubst'
 Check_Executable 'java'
 Check_Executable 'nc'
+
+Check_Set "${CONFIGS}"
+Check_Dir "${CONFIGS}"
+Check_Set "${SECRETS}"
+Check_Dir "${SECRETS}"
 
 Check_Set "${LOCKSS_LOGS}" LOCKSS_LOGS
 Check_Dir "${LOCKSS_LOGS}"
@@ -214,7 +238,10 @@ else
     #
     # !LOCKSS_IS_REPO and !LOCKSS_IS_CONFIG
     #
-    Check_Set "${LOCKSS_CONFIG_URL}" CFG_URL
+    Check_Set "${LOCKSS_CONFIG_URL}" LOCKSS_CONFIG_URL
+    Check_Set "${LOCKSS_ADMIN_USER}" LOCKSS_ADMIN_USER
+    Check_File "${SECRETS}/lockss_ui_pass"
+    LOCKSS_CONFIG_URL="${LOCKSS_CONFIG_URL%%://*}://$(Url_Encode "${LOCKSS_ADMIN_USER}"):$(Url_Encode "$(cat "${SECRETS}/lockss_ui_pass")@${LOCKSS_CONFIG_URL#*://}"
     ARGS_CLUSTER="-c ${LOCKSS_CONFIG_URL} -l ${LOCKSS_CONFIG_URL}/config/file/cluster"
   fi
 
