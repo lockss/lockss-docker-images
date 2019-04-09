@@ -172,8 +172,6 @@ Check_Executable 'nc'
 
 Check_Set "${CONFIGS}"
 Check_Dir "${CONFIGS}"
-Check_Set "${SECRETS}"
-Check_Dir "${SECRETS}"
 
 Check_Set "${LOCKSS_LOGS}" LOCKSS_LOGS
 Check_Dir "${LOCKSS_LOGS}"
@@ -240,8 +238,10 @@ else
     #
     Check_Set "${LOCKSS_CONFIG_URL}" LOCKSS_CONFIG_URL
     Check_Set "${LOCKSS_ADMIN_USER}" LOCKSS_ADMIN_USER
+    Check_Set "${SECRETS}"
+    Check_Dir "${SECRETS}"
     Check_File "${SECRETS}/lockss_ui_pass"
-    LOCKSS_CONFIG_URL="${LOCKSS_CONFIG_URL%%://*}://$(Url_Encode "${LOCKSS_ADMIN_USER}"):$(Url_Encode "$(cat "${SECRETS}/lockss_ui_pass")@${LOCKSS_CONFIG_URL#*://}"
+    LOCKSS_CONFIG_URL="${LOCKSS_CONFIG_URL%%://*}://$(Url_Encode "${LOCKSS_ADMIN_USER}"):$(Url_Encode "$(cat "${SECRETS}/lockss_ui_pass")")@${LOCKSS_CONFIG_URL#*://}"
     ARGS_CLUSTER="-c ${LOCKSS_CONFIG_URL} -l ${LOCKSS_CONFIG_URL}/config/file/cluster"
   fi
 
