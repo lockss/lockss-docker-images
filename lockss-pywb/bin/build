@@ -30,7 +30,8 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 ROOT_DIR="$(realpath "$(dirname "${0}")/..")"
-TAG='lockss/lockss-pywb:2.2.20190311-2'
+TAG_FILE="${ROOT_DIR}/VERSION"
+TAG="lockss/lockss-pywb:$(cat "${TAG_FILE}")"
 
 PUSH=''
 if [ "${1}" == '--push' ]; then

@@ -147,6 +147,9 @@ echo "$(date) Layering configuration..."
 Apply_Config /usr/local/share/pywb/etc
 echo "$(date) Done layering configuration."
 
+echo "$(date) Copying configuration to ${VOLUME_DIR}..."
+cp "${PYWB_HOME}/config.yaml" "${PYWB_HOME}/uwsgi.ini" "${VOLUME_DIR}"
+
 # Sequencing
 
 if [ -n "${LOCKSS_WAIT_FOR_PORT}" ]; then
@@ -158,5 +161,5 @@ if [ -n "${LOCKSS_WAIT_FOR_200}" ]; then
 fi
 
 # Invoke (exec) the original webrecorder/pywb entrypoint; TODO: $@ ?
-cd "${PYWB_HOME}"
+cd "${VOLUME_DIR}"
 exec "${PYWB_HOME}/docker-entrypoint.sh" uwsgi /uwsgi/uwsgi.ini

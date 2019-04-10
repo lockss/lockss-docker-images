@@ -29,7 +29,7 @@
 
 FROM lockss/lockss-debian:stretch-20190326-slim-1 AS lockss-debian
 
-FROM webrecorder/pywb:2.2.20190311
+FROM webrecorder/pywb:2.2.20190410
 
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
 
