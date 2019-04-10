@@ -27,39 +27,19 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-debian:stretch-20190326-slim-1 AS lockss-debian
+collections:
+    lockss:
+        archive_paths: http://${REPO_HOST}:${REPO_REST_PORT}/warcs/
+        index:
+            type: cdx
+            api_url: http://${REPO_HOST}:${REPO_REST_PORT}/cdx/pywb/collectionid?url={url}&matchType={matchType}&sort={sort}&closest={closest}&output={output}&fl={fl}
+            replay_url: ""
 
-FROM webrecorder/pywb:2.2.20190311
+# Settings for each collection
+use_js_obj_proxy: true
 
-MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
+# Memento support, enable
+enable_memento: true
 
-ENV LOCKSS_WAIT_FOR_PORT_TIMEOUT=3 \
-    LOCKSS_WAIT_FOR_PORT_SLEEP=10 \
-    LOCKSS_WAIT_FOR_200_TIMEOUT=3 \
-    LOCKSS_WAIT_FOR_200_SLEEP=10 \
-    PYWB_HOME=/webarchive \
-    PYWB_COLLECTION=lockss \
-    PYWB_DATA=/data \
-    PYWB_PORT=8080
-
-ENV INIT_COLLECTION=${PYWB_COLLECTION} \
-    VOLUME_DIR=${PYWB_DATA}
-
-# Inherit IPM from lockss-debian
-COPY --from=lockss-debian /usr/local/etc/ipm/* /usr/local/etc/ipm/
-COPY --from=lockss-debian /usr/local/bin/* /usr/local/bin/
-RUN ipm-setup apt-transport-https
-
-# Install curl, envsubst and nc
-RUN ipm-update \
- && ipm-install curl \
-                gettext \
-                netcat \
- && ipm-clean
-
-COPY /docker/pywb/etc/config.yaml.tpl /usr/local/share/pywb/etc/
-COPY /docker/bin/* /usr/local/bin/
-
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
-
-HEALTHCHECK --retries=1 --start-period=60s CMD ["/usr/local/bin/docker-healthcheck"]
+# Replay content in an iframe
+framed_replay: true
