@@ -31,6 +31,29 @@
 
 _0="$(basename "${0}")"
 
+Apply_Config()
+{
+  echo "$(date) Applying config from ${1}..."
+  if [ -d "${1}" ]; then
+    : \
+    && TMP=$(mktemp -d) \
+    && cd "${TMP}" \
+    && ( cd "${1}" && tar cf - . ) | tar xf - \
+    && for f in $(find . -type f -name '*.tpl'); do
+         envsubst < "${f}" > "$(dirname "${f}")/$(basename "${f}" '.tpl')"
+       done \
+    && cd "${PYWB_HOME}" \
+    && ( cd "${TMP}" && tar cf - --exclude '*.tpl' . ) | tar xf -
+    RET=$?
+    rm -rf "${TMP}"
+    echo "$(date) Done applying config from ${1}."
+    return $RET
+  else
+    echo "$(date) No config directory ${1}."
+    return 0
+  fi
+}
+
 Check_Dir()
 {
   if [ ! -d "${1}" ]; then
@@ -63,46 +86,80 @@ Check_Set()
   fi
 }
 
-Check_Set "${PYWB_COLLECTION}" PYWB_COLLECTION
-Check_Set "${PYWB_HDFSMNT}" PYWB_HDFSMNT
+# $1=space separated string of host:port pairs
+Wait_For_Port()
+{
+  echo "$(date) Starting wait for port on: $@"
+  for hostport in $@ ; do
+    echo "$(date) Waiting for port on ${hostport}..."
+    host="${hostport%%:*}"
+    port="${hostport#*:}"
+    until nc -z -w "${LOCKSS_WAIT_FOR_PORT_TIMEOUT}" "${host}" "${port}" ; do
+      sleep "${LOCKSS_WAIT_FOR_PORT_SLEEP}"
+    done
+    echo "$(date) Done waiting for port on ${hostport}."
+  done
+  echo "$(date) Done waiting for ports."
+}
 
-Check_Executable 'hadoop-fuse-dfs'
-Check_Executable 'ln'
+# $1=space separated string of host:port pairs
+Wait_For_200()
+{
+  echo "$(date) Starting wait for HTTP 200 responses from: $@"
+  for hostport in $@ ; do
+    url="http://${hostport}/status"
+    echo "$(date) Waiting for HTTP 200 response from ${url}..."
+    until curl --silent --max-time "${LOCKSS_WAIT_FOR_200_TIMEOUT}" --location "${url}" ; do
+      sleep "${LOCKSS_WAIT_FOR_200_SLEEP}"
+    done
+    echo "$(date) Done waiting for HTTP 200 response from ${url}."
+  done
+  echo "$(date) Done waiting for HTTP 200 responses."
+}
+
+# Begin container execution
+
+echo "$(date) *************** CONTAINER ENTRY POINT ***************"
+echo "$(date) Beginning execution..."
+echo "$(date) Environment:"
+env
+
+# Sanity checks
+
+echo "$(date) Sanity checks..."
+
+Check_Executable 'curl'
+Check_Executable 'envsubst'
 Check_Executable 'nc'
-Check_Set "${LOCKSS_HDFS_HOST}" LOCKSS_HDFS_HOST
-Check_Set "${LOCKSS_HDFS_FS_PORT}" LOCKSS_HDFS_FS_PORT
-Check_Set "${LOCKSS_REPO_BASEDIR}" LOCKSS_REPO_BASEDIR
 
-mkdir -p "${PYWB_HDFSMNT}"
-Check_Dir "${PYWB_HDFSMNT}"
+Check_Set "${PYWB_COLLECTION}" PYWB_COLLECTION
+Check_Set "${PYWB_PORT}" PYWB_PORT
 
-# Wait for HDFS to become available
-echo -n " * Waiting for ${LOCKSS_HDFS_HOST}:${LOCKSS_HDFS_FS_PORT}: ."
-while ! nc -z "${LOCKSS_HDFS_HOST}" "${LOCKSS_HDFS_FS_PORT}" ; do
-  sleep 1
-  echo -n '.'
-done
-echo
+Check_Set "${REPO_HOST}" REPO_HOST
+Check_Set "${REPO_REST_PORT}" REPO_REST_PORT
 
-DFS_URL="dfs://${LOCKSS_HDFS_HOST}:${LOCKSS_HDFS_FS_PORT}/"
-echo " * Mounting ${DFS_URL} to ${PYWB_HDFSMNT}"
-hadoop-fuse-dfs "${DFS_URL}" ${PYWB_HDFSMNT}
-if [ "$?" != "0" ]; then
-  echo "${_0}: mount failed: ${DFS_URL}"
-  exit 1
+Check_Set "${INIT_COLLECTION}"
+Check_Dir "${VOLUME_DIR}"
+
+# Layer configuration
+
+echo "$(date) Layering configuration..."
+Apply_Config /usr/local/share/pywb/etc
+echo "$(date) Done layering configuration."
+
+echo "$(date) Copying configuration to ${VOLUME_DIR}..."
+cp "${PYWB_HOME}/config.yaml" "${PYWB_HOME}/uwsgi.ini" "${VOLUME_DIR}"
+
+# Sequencing
+
+if [ -n "${LOCKSS_WAIT_FOR_PORT}" ]; then
+  Wait_For_Port "${LOCKSS_WAIT_FOR_PORT}"
 fi
 
-# Ensure the sealed directory exists under HDFS
-# Note: -p doesn't work under Fuse HDFS, used so mkdir is quiet
-PYWB_WATCHDIR_PARENT="${PYWB_HDFSMNT}/${LOCKSS_REPO_BASEDIR}"
-mkdir -p "${PYWB_WATCHDIR_PARENT}"
-PYWB_WATCHDIR="${PYWB_WATCHDIR_PARENT}/sealed"
-mkdir -p "${PYWB_WATCHDIR}"
-
-ln -s -f ${PYWB_WATCHDIR} ${PYWB_DATA}/collections/${PYWB_COLLECTION}/archive
-
-Check_Dir "${VOLUME_DIR}"
-export INIT_COLLECTION="${LOCKSS_PYWB_COLLECTION}"
+if [ -n "${LOCKSS_WAIT_FOR_200}" ]; then
+  Wait_For_200 "${LOCKSS_WAIT_FOR_200}"
+fi
 
 # Invoke (exec) the original webrecorder/pywb entrypoint; TODO: $@ ?
-exec "${VOLUME_DIR}/docker-entrypoint.sh" uwsgi /uwsgi/uwsgi.ini
+cd "${VOLUME_DIR}"
+exec "${PYWB_HOME}/docker-entrypoint.sh" uwsgi /uwsgi/uwsgi.ini

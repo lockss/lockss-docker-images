@@ -31,38 +31,4 @@
 
 _0="$(basename "${0}")"
 
-Check_Dir()
-{
-  if [ ! -d "${1}" ]; then
-    echo "${_0}: directory not found: ${1}"
-    exit 1
-  fi
-}
-
-Check_Executable()
-{
-  if ! which "${1}" > /dev/null 2>&1 ; then
-    echo "${_0}: ${1} not on the PATH"
-    exit 1
-  fi
-}
-
-Check_File()
-{
-  if [ ! -f "${1}" ]; then
-    echo "${_0}: file not found: ${1}"
-    exit 1
-  fi
-}
-
-Check_Set()
-{
-  if [ -z "${1}" ]; then
-    echo "${_0}: environment variable is not set: ${2}"
-    exit 1
-  fi
-}
-
-Check_Executable 'nc'
-Check_Set "${PYWB_PORT}" PYWB_PORT
-nc -z localhost "${PYWB_PORT}" || exit 1
+kill -0 1 2> /dev/null || exit 1

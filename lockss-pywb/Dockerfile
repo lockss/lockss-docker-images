@@ -27,47 +27,39 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# webrecorder/pywb:2.2.20190311 is debian:stretch based
-FROM lockss/lockss-debian:stretch-20190228-2 AS lockss-debian
+FROM lockss/lockss-debian:stretch-20190326-slim-1 AS lockss-debian
 
-FROM lockss/webrecorder-pywb:2.2.20190311-3.6.8-jessie
+FROM webrecorder/pywb:2.2.20190410
 
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
 
-ENV PYWB_COLLECTION=lockss \
-    PYWB_HDFSMNT=/mnt/hdfs \
-    PYWB_DATA=/webarchive \
+ENV LOCKSS_WAIT_FOR_PORT_TIMEOUT=3 \
+    LOCKSS_WAIT_FOR_PORT_SLEEP=10 \
+    LOCKSS_WAIT_FOR_200_TIMEOUT=3 \
+    LOCKSS_WAIT_FOR_200_SLEEP=10 \
+    PYWB_HOME=/webarchive \
+    PYWB_COLLECTION=lockss \
+    PYWB_DATA=/data \
     PYWB_PORT=8080
 
-COPY /docker/bin/* /usr/local/bin/
-
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
-
-HEALTHCHECK --retries=1 --start-period=60s CMD ["/usr/local/bin/docker-healthcheck"]
+ENV INIT_COLLECTION=${PYWB_COLLECTION} \
+    VOLUME_DIR=${PYWB_DATA}
 
 # Inherit IPM from lockss-debian
 COPY --from=lockss-debian /usr/local/etc/ipm/* /usr/local/etc/ipm/
 COPY --from=lockss-debian /usr/local/bin/* /usr/local/bin/
 RUN ipm-setup apt-transport-https
 
-# USER directive commented out in webrecorder/pywb:2.2.20190311 
-#USER root
-
-# Install curl and add Cloudera signing key
+# Install curl, envsubst and nc
 RUN ipm-update \
  && ipm-install curl \
-                gnupg \
+                gettext \
                 netcat \
- && curl -L https://archive.cloudera.com/cdh5/debian/jessie/amd64/cdh/archive.key | apt-key add -
-
-# Add Cloudera repository
-COPY /docker/apt/etc/cloudera.list /etc/apt/sources.list.d/
-COPY /docker/apt/etc/cloudera.pref /etc/apt/preferences.d/
-
-# Install hadoop-hdfs-fuse
-RUN ipm-update \
- && ipm-install-native hadoop-hdfs-fuse \
  && ipm-clean
 
-# Commented out in webrecorder/pywb:2.2.20190311 also
-#USER archivist
+COPY /docker/pywb/etc/config.yaml.tpl /usr/local/share/pywb/etc/
+COPY /docker/bin/* /usr/local/bin/
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
+
+HEALTHCHECK --retries=1 --start-period=60s CMD ["/usr/local/bin/docker-healthcheck"]

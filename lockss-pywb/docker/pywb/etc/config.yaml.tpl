@@ -1,5 +1,3 @@
-#!/bin/sh
-
 # Copyright (c) 2000-2019, Board of Trustees of Leland Stanford Jr. University
 # All rights reserved.
 #
@@ -29,17 +27,19 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-ROOT_DIR="$(realpath "$(dirname "${0}")/..")"
-TAG_FILE="${ROOT_DIR}/VERSION"
-TAG="lockss/lockss-pywb:$(cat "${TAG_FILE}")"
+collections:
+    lockss:
+        archive_paths: http://${REPO_HOST}:${REPO_REST_PORT}/warcs/
+        index:
+            type: cdx
+            api_url: http://${REPO_HOST}:${REPO_REST_PORT}/cdx/pywb/lockss?url={url}&matchType={matchType}&sort={sort}&closest={closest}&output={output}&fl={fl}
+            replay_url: ""
 
-PUSH=''
-if [ "${1}" == '--push' ]; then
-  PUSH='true'
-  shift
-fi
+# Settings for each collection
+use_js_obj_proxy: true
 
-docker build --tag "${TAG}" "$@" "${ROOT_DIR}" \
-&& if [ -n "${PUSH}" ]; then
-     docker push "${TAG}"
-   fi
+# Memento support, enable
+enable_memento: true
+
+# Replay content in an iframe
+framed_replay: true
