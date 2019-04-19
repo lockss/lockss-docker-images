@@ -48,17 +48,18 @@ ONBUILD ARG LABEL_VERSION
 ONBUILD ARG LOCKSS_REST_PORT
 ONBUILD RUN test -n "${LABEL_BUILD_DATE}"     || exit  1 \
          && test -n "${LABEL_DESCRIPTION}"    || exit  2 \
-         && test -n "${LABEL_LOCKSS_RELEASE}" || exit  3 \
-         && test -n "${LABEL_MAVEN_ARTIFACT}" || exit  4 \
-         && test -n "${LABEL_MAVEN_GROUP}"    || exit  5 \
-         && test -n "${LABEL_MAVEN_VERSION}"  || exit  6 \
-         && test -n "${LABEL_NAME}"           || exit  7 \
-         && test -n "${LABEL_URL}"            || exit  8 \
-         && test -n "${LABEL_VCS_REF}"        || exit  9 \
-         && test -n "${LABEL_VCS_URL}"        || exit 10 \
-         && test -n "${LABEL_VENDOR}"         || exit 11 \
-         && test -n "${LABEL_VERSION}"        || exit 12 \
-         && test -n "${LOCKSS_REST_PORT}"     || exit 13
+         && test -n "${LABEL_GIT_DIRTY}"      || exit  3 \
+         && test -n "${LABEL_LOCKSS_RELEASE}" || exit  4 \
+         && test -n "${LABEL_MAVEN_ARTIFACT}" || exit  5 \
+         && test -n "${LABEL_MAVEN_GROUP}"    || exit  6 \
+         && test -n "${LABEL_MAVEN_VERSION}"  || exit  7 \
+         && test -n "${LABEL_NAME}"           || exit  8 \
+         && test -n "${LABEL_URL}"            || exit  9 \
+         && test -n "${LABEL_VCS_REF}"        || exit 10 \
+         && test -n "${LABEL_VCS_URL}"        || exit 11 \
+         && test -n "${LABEL_VENDOR}"         || exit 12 \
+         && test -n "${LABEL_VERSION}"        || exit 13 \
+         && test -n "${LOCKSS_REST_PORT}"     || exit 14
 
 #
 # OPTIONAL BUILD ARGUMENTS (CHILD)
@@ -75,6 +76,7 @@ ONBUILD ENV LABEL_MAINTAINER="buildmaster@lockss.org" \
             \
             LABEL_BUILD_DATE="${LABEL_BUILD_DATE}" \
             LABEL_DESCRIPTION="${LABEL_DESCRIPTION}" \
+            LABEL_GIT_DIRTY="${LABEL_GIT_DIRTY}" \
             LABEL_LOCKSS_RELEASE="${LABEL_LOCKSS_RELEASE}" \
             LABEL_MAVEN_ARTIFACT="${LABEL_MAVEN_ARTIFACT}" \
             LABEL_MAVEN_GROUP="${LABEL_MAVEN_GROUP}" \
@@ -98,6 +100,7 @@ ONBUILD LABEL maintainer="${LABEL_MAINTAINER}" \
               \
               org.label-schema.build-date="${LABEL_BUILD_DATE}" \
               org.label-schema.description="${LABEL_DESCRIPTION}" \
+              org.lockss.label.git-dirty="${LABEL_GIT_DIRTY}" \
               org.lockss.label.lockss-release="${LABEL_LOCKSS_RELEASE}" \
               org.lockss.label.maven-artifact="${LABEL_MAVEN_ARTIFACT}" \
               org.lockss.label.maven-group="${LABEL_MAVEN_GROUP}" \
@@ -107,15 +110,15 @@ ONBUILD LABEL maintainer="${LABEL_MAINTAINER}" \
               org.label-schema.vcs-ref="${LABEL_VCS_REF}" \
               org.label-schema.vcs-url="${LABEL_VCS_URL}" \
               org.label-schema.vendor="${LABEL_VENDOR}" \
-              org.label-schema.vcs-version="${LABEL_VERSION}"
+              org.label-schema.version="${LABEL_VERSION}"
 
 ONBUILD EXPOSE ${LOCKSS_REST_PORT} ${LOCKSS_UI_PORT}
 
 # Environment variables
-ENV LOCKSS_WAIT_FOR_PORT_TIMEOUT=3 \
-    LOCKSS_WAIT_FOR_PORT_SLEEP=10 \
-    LOCKSS_WAIT_FOR_200_TIMEOUT=3 \
-    LOCKSS_WAIT_FOR_200_SLEEP=10 \
+ENV LOCKSS_WAIT_FOR_PORT_TIMEOUT=5 \
+    LOCKSS_WAIT_FOR_PORT_SLEEP=5 \
+    LOCKSS_WAIT_FOR_200_TIMEOUT=5 \
+    LOCKSS_WAIT_FOR_200_SLEEP=5 \
     CONFIGS=/run/configs \
     SECRETS=/run/secrets \
     LOCKSS_HOME=/usr/local/share/lockss \
