@@ -231,7 +231,7 @@ else
     #
     Check_Set "${LOCKSS_PROPS_URL}" LOCKSS_PROPS_URL
     Check_File "${CONFIGS}/lockss_cluster"
-    ARGS_CLUSTER=" -l ${LOCKSS_PROPS_URL} -l ${CONFIGS}/lockss_cluster"
+    ARGS_CLUSTER="-l ${LOCKSS_PROPS_URL} -l ${CONFIGS}/lockss_cluster -l ${CONFIGS}/lockss_cluster_opt"
   else
     #
     # !LOCKSS_IS_REPO and !LOCKSS_IS_CONFIG
