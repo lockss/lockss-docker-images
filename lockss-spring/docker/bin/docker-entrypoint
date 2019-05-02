@@ -220,7 +220,7 @@ else
 
   echo "$(date) Bootstrap configuration..."
   Check_File "${CONFIGS}/lockss_bootstrap"
-  ARGS_BOOTSTRAP="-b ${LOCKSS_HOME}/etc/lockss_bootstrap_base -b ${CONFIGS}/lockss_bootstrap -b resource:application.properties"
+  ARGS_BOOTSTRAP="-b resource:application.properties -b ${LOCKSS_HOME}/etc/lockss_bootstrap_base -b ${CONFIGS}/lockss_bootstrap"
 
   # Cluster configuration
 
