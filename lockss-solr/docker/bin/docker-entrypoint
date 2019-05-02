@@ -132,16 +132,16 @@ Check_Executable 'curl'
 Check_Executable 'envsubst'
 Check_Executable 'nc'
 
+Check_Set "${SOLR_CORE_REPO}" SOLR_CORE_REPO
+Check_Set "${SOLR_HOME}" SOLR_HOME
 Check_Set "${SOLR_PORT}" SOLR_PORT
+Check_Set "${SOLR_ROOT}" SOLR_ROOT
 
 # Layer configuration
 
 echo "$(date) Layering configuration..."
-Apply_Config /usr/local/share/solr/etc
+Apply_Config /usr/local/etc/solr
 echo "$(date) Done layering configuration."
-
-echo "$(date) Copying configuration to ${SOLR_HOME}/server/solr..."
-cp "${SOLR_HOME}/security.json" "${SOLR_HOME}/server/solr"
 
 # Sequencing
 
@@ -153,6 +153,6 @@ if [ -n "${LOCKSS_WAIT_FOR_200}" ]; then
   Wait_For_200 "${LOCKSS_WAIT_FOR_200}"
 fi
 
-# Invoke (exec) the original webrecorder/pywb entrypoint; TODO: $@ ?
-#cd "${VOLUME_DIR}"
-#exec "${SOLR_HOME}/docker-entrypoint.sh" uwsgi /uwsgi/uwsgi.ini
+# Invoke (exec) the original SOLR entrypoint
+cd "${SOLR_ROOT}"
+exec solr-precreate "$SOLR_CORE_REPO"

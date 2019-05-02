@@ -27,7 +27,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-debian:stretch-20190326-slim-1 AS lockss-debian
+FROM lockss/lockss-alpine:3.9.3 AS lockss-alpine
 
 FROM solr:6.6.5-alpine
 
@@ -37,8 +37,10 @@ ENV LOCKSS_WAIT_FOR_PORT_TIMEOUT=3 \
     LOCKSS_WAIT_FOR_PORT_SLEEP=10 \
     LOCKSS_WAIT_FOR_200_TIMEOUT=3 \
     LOCKSS_WAIT_FOR_200_SLEEP=10 \
-    SOLR_HOME=/solr \
+    SOLR_ROOT=/opt/solr \
+    SOLR_HOME=/opt/solr/server/solr \
     SOLR_PORT=8983
+    SOLR_VERSION=6.6.5
 
 # Inherit IPM from lockss-debian
 COPY --from=lockss-debian /usr/local/etc/ipm/* /usr/local/etc/ipm/
@@ -52,7 +54,7 @@ RUN ipm-update \
                 netcat \
  && ipm-clean
 
-COPY /docker/solr/etc/security.json.yaml.tpl /usr/local/share/solr/etc/
+COPY /docker/solr/etc/security.json.tpl /usr/local/etc/solr/
 COPY /docker/bin/* /usr/local/bin/
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
