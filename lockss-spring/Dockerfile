@@ -46,7 +46,6 @@ ONBUILD ARG LABEL_VCS_REF
 ONBUILD ARG LABEL_VCS_URL
 ONBUILD ARG LABEL_VENDOR
 ONBUILD ARG LABEL_VERSION
-ONBUILD ARG LOCKSS_REST_PORT
 ONBUILD RUN test -n "${LABEL_BUILD_DATE}"     || exit  1 \
          && test -n "${LABEL_DESCRIPTION}"    || exit  2 \
          && test -n "${LABEL_GIT_DIRTY}"      || exit  3 \
@@ -59,14 +58,7 @@ ONBUILD RUN test -n "${LABEL_BUILD_DATE}"     || exit  1 \
          && test -n "${LABEL_VCS_REF}"        || exit 10 \
          && test -n "${LABEL_VCS_URL}"        || exit 11 \
          && test -n "${LABEL_VENDOR}"         || exit 12 \
-         && test -n "${LABEL_VERSION}"        || exit 13 \
-         && test -n "${LOCKSS_REST_PORT}"     || exit 14
-
-#
-# OPTIONAL BUILD ARGUMENTS (CHILD)
-#
-
-ONBUILD ARG LOCKSS_UI_PORT
+         && test -n "${LABEL_VERSION}"        || exit 13
 
 #
 # ENVIRONMENT VARIABLES (CHILD)
@@ -87,10 +79,7 @@ ONBUILD ENV LABEL_MAINTAINER="buildmaster@lockss.org" \
             LABEL_VCS_REF="${LABEL_VCS_REF}" \
             LABEL_VCS_URL="${LABEL_VCS_URL}" \
             LABEL_VENDOR="${LABEL_VENDOR}" \
-            LABEL_VERSION="${LABEL_VERSION}" \
-            LOCKSS_REST_PORT="${LOCKSS_REST_PORT}" \
-            \
-            LOCKSS_UI_PORT="${LOCKSS_UI_PORT}"
+            LABEL_VERSION="${LABEL_VERSION}"
 
 #
 # LABELS (CHILD)

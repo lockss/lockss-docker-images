@@ -157,7 +157,7 @@ echo "$(date) *************** CONTAINER ENTRY POINT ***************"
 echo "$(date) Beginning execution..."
 echo "$(date) Maven coordinates: ${LABEL_MAVEN_GROUP}:${LABEL_MAVEN_ARTIFACT}:${LABEL_MAVEN_VERSION}"
 echo "$(date) Environment:"
-env
+env | sort
 
 # Sanity checks
 
@@ -220,7 +220,7 @@ else
 
   echo "$(date) Bootstrap configuration..."
   Check_File "${CONFIGS}/lockss_bootstrap"
-  ARGS_BOOTSTRAP="-b ${LOCKSS_HOME}/etc/lockss_bootstrap_base -b ${CONFIGS}/lockss_bootstrap"
+  ARGS_BOOTSTRAP="-b ${LOCKSS_HOME}/etc/lockss_bootstrap_base -b ${CONFIGS}/lockss_bootstrap -b resource:application.properties"
 
   # Cluster configuration
 
