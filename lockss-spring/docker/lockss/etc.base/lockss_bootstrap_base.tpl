@@ -29,3 +29,4 @@
 
 org.lockss.platform.diskSpacePaths=${LOCKSS_DATA}
 org.lockss.platform.tmpDir=${LOCKSS_TMP}
+org.lockss.platform.logdirectory=${LOCKSS_LOGS}
