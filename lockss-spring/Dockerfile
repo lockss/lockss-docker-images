@@ -121,7 +121,7 @@ RUN ipm-update \
  && ipm-install curl \
                 gettext \
                 netcat \
-                openjdk8-jre \
+                openjdk8 \
  && ipm-clean
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
@@ -132,3 +132,8 @@ COPY /docker/bin/* /usr/local/bin/
 COPY /docker/lockss/etc.base/* "${LOCKSS_HOME}/etc.base/"
 ONBUILD COPY /docker/lockss/etc.base/* "${LOCKSS_HOME}/etc.base/"
 ONBUILD COPY /target/current-with-deps.jar "${LOCKSS_HOME}/lib/lockss.jar"
+
+WORKDIR /tmp
+
+# Find a better long-term solution
+RUN ln -s /usr/lib/jvm/default-jvm/bin/jcmd /usr/local/bin/
