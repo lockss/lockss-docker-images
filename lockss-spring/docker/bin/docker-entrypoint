@@ -54,7 +54,7 @@ Apply_Config()
     && cd "${TMP}" \
     && ( cd "${1}" && tar cf - . ) | tar xf - \
     && for f in $(find . -type f -name '*.tpl'); do
-         envsubst < "${f}" > "$(dirname "${f}")/$(basename "${f}" '.tpl')"
+         DOLLAR='$' envsubst < "${f}" > "$(dirname "${f}")/$(basename "${f}" '.tpl')"
        done \
     && cd "${LOCKSS_HOME}/etc" \
     && ( cd "${TMP}" && tar cf - --exclude '*.tpl' . ) | tar xf -

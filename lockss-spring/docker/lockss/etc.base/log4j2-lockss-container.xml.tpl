@@ -45,4 +45,22 @@ POSSIBILITY OF SUCH DAMAGE.
 
   </Properties>
 
+  <Appenders>
+
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout>
+	<Pattern>${DOLLAR}{layout.console}</Pattern>
+      </PatternLayout>
+      <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+    </Console>
+
+    <Console name="Console.Lockss" target="SYSTEM_OUT">
+      <PatternLayout>
+	<Pattern>${DOLLAR}{layout.console.lockss}</Pattern>
+      </PatternLayout>
+      <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+    </Console>
+
+  </Appenders>
+
 </Configuration>
