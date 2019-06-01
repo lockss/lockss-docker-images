@@ -27,7 +27,13 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-alpine:3.9.3-1
+FROM lockss/lockss-alpine:3.9.3-1 as lockss-alpine
+
+FROM adoptopenjdk/openjdk8:jdk8u212-b03-alpine
+
+COPY --from=lockss-alpine /usr/local/etc/ipm/* /usr/local/etc/ipm/
+COPY --from=lockss-alpine /usr/local/bin/* /usr/local/bin/
+RUN ipm-setup
 
 #
 # MANDATORY BUILD ARGUMENTS (CHILD)
@@ -102,6 +108,7 @@ ONBUILD LABEL maintainer="${LABEL_MAINTAINER}" \
               org.label-schema.vendor="${LABEL_VENDOR}" \
               org.label-schema.version="${LABEL_VERSION}"
 
+# Obsolete?
 ONBUILD EXPOSE ${LOCKSS_REST_PORT} ${LOCKSS_UI_PORT}
 
 # Environment variables
@@ -117,11 +124,12 @@ ENV LOCKSS_WAIT_FOR_PORT_TIMEOUT=5 \
     LOCKSS_TMP=/data/temp \
     LOCKSS_LOGS=/var/log/lockss
 
+WORKDIR /tmp
+
 RUN ipm-update \
  && ipm-install curl \
                 gettext \
                 netcat \
-                openjdk8 \
  && ipm-clean
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
@@ -132,8 +140,3 @@ COPY /docker/bin/* /usr/local/bin/
 COPY /docker/lockss/etc.base/* "${LOCKSS_HOME}/etc.base/"
 ONBUILD COPY /docker/lockss/etc.base/* "${LOCKSS_HOME}/etc.base/"
 ONBUILD COPY /target/current-with-deps.jar "${LOCKSS_HOME}/lib/lockss.jar"
-
-WORKDIR /tmp
-
-# Find a better long-term solution
-RUN ln -s /usr/lib/jvm/default-jvm/bin/jcmd /usr/local/bin/
