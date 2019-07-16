@@ -201,6 +201,7 @@ ARGS_REPO=''
 ARGS_BOOTSTRAP=''
 ARGS_CLUSTER=''
 ARGS_SERVICE=''
+ARGS_GROUP=''
 if [ "${LOCKSS_IS_REPO}" = 'true' ]; then
 
   #
@@ -249,8 +250,13 @@ else
 
   echo "$(date) Service configuration..."
   Check_File "${CONFIGS}/lockss_service"
-  ARGS_SERVICE="-p ${LOCKSS_HOME}/etc/lockss_service_base -p ${CONFIGS}/lockss_service -p ${CONFIGS}/lockss_service_opt -g ${LOCKSS_PRESERVATION_GROUP}"
+  ARGS_SERVICE="-p ${LOCKSS_HOME}/etc/lockss_service_base -p ${CONFIGS}/lockss_service -p ${CONFIGS}/lockss_service_opt"
 
+  # Group configuration
+  echo "$(date) Group configuration..."
+  if [ -n ${LOCKSS_PRESERVATION_GROUP} ]; then
+    ARGS_GROUP="-g ${LOCKSS_PRESERVATION_GROUP}"
+  fi
 fi
 
 # Sequencing
@@ -301,5 +307,6 @@ exec java ${JVM_OPTS_DOCKER} \
           ${ARGS_BOOTSTRAP} \
           ${ARGS_CLUSTER} \
           ${ARGS_SERVICE} \
+          ${ARGS_GROUP} \
           ${ARGS_REPO} \
           ${ARGS_ADDITIONAL}
