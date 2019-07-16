@@ -249,7 +249,7 @@ else
 
   echo "$(date) Service configuration..."
   Check_File "${CONFIGS}/lockss_service"
-  ARGS_SERVICE="-p ${LOCKSS_HOME}/etc/lockss_service_base -p ${CONFIGS}/lockss_service -p ${CONFIGS}/lockss_service_opt"
+  ARGS_SERVICE="-p ${LOCKSS_HOME}/etc/lockss_service_base -p ${CONFIGS}/lockss_service -p ${CONFIGS}/lockss_service_opt -g ${LOCKSS_PRESERVATION_GROUP}"
 
 fi
 
