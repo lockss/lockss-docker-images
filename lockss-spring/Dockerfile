@@ -129,6 +129,7 @@ WORKDIR /tmp
 RUN ipm-update \
  && ipm-install curl \
                 gettext \
+                jq \
                 netcat \
  && ipm-clean
 
