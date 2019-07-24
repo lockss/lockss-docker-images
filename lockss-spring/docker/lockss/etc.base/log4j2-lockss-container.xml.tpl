@@ -40,7 +40,7 @@ POSSIBILITY OF SUCH DAMAGE.
     <Property name="log.file">daemon</Property>
 
     <!-- roll over into five 100MB files -->
-    <Property name="log.rollingfile.sizetrigger">100 MB</Property>
+    <Property name="log.rollingfile.sizetrigger">10 MB</Property>
     <Property name="log.rollingfile.maxrollover">5</Property>
 
   </Properties>
