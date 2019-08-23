@@ -158,12 +158,17 @@ Wait_For_200()
 }
 
 # Beginning
+
+# Sanity check for stdout/stderr logging
 Check_Set "${LOCKSS_LOGS}" LOCKSS_LOGS
 Check_Dir "${LOCKSS_LOGS}"
-# redirect stdout and stderr to files
-echo "$(date) Redirecting stdout=>${LOCKSS_LOGS}/stdout.log and stderr ${LOCKSS_LOGS}/stderr.log..."
-exec >${LOCKSS_LOGS}/stdout.log
-exec 2>${LOCKSS_LOGS}/stderr.log
+
+LOCKSS_LOGFILE="${LOCKSS_LOGS}/stdout.log"
+
+# redirect stdout and stderr to file
+echo "$(date) Redirecting stdout and stderr to ${LOCKSS_LOGFILE}."
+exec >$LOCKSS_LOGFILE
+exec 2>$LOCKSS_LOGFILE
 
 echo "$$" > "${STARTUP_FILE}"
 rm -f "${PID_FILE}"
