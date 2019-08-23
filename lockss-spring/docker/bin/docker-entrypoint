@@ -209,24 +209,27 @@ echo "$(date) Done layering configuration."
 # Relevant if LOCKSS_IS_REPO
 JVM_OPTS_REPO=''
 ARGS_REPO=''
-# Relevant if !LOCKSS_IS_REPO
+
+# Relevant for all services
 ARGS_BOOTSTRAP=''
 ARGS_CLUSTER=''
 ARGS_SERVICE=''
 ARGS_GROUP=''
+
 if [ "${LOCKSS_IS_REPO}" = 'true' ]; then
 
   #
   # LOCKSS_IS_REPO
   #
   echo "$(date) Repository service configuration..."
-  JVM_OPTS_REPO="-Dorg.lockss.jmsUri=tcp://${LOCKSS_JMS_HOST}:${LOCKSS_JMS_PORT}"
   ARGS_REPO="--spring.config.location=file:${CONFIGS}/lockss.properties"
 
-else
+fi
+
+  # (left indented for now to clarify diffs)
 
   #
-  # !LOCKSS_IS_REPO
+  # All services
   #
 
   # Bootstrap configuration
@@ -240,14 +243,14 @@ else
   echo "$(date) Cluster configuration..."
   if [ "${LOCKSS_IS_CONFIG}" = 'true' ]; then
     #
-    # !LOCKSS_IS_REPO and LOCKSS_IS_CONFIG
+    # LOCKSS_IS_CONFIG
     #
     Check_Set "${LOCKSS_PROPS_URL}" LOCKSS_PROPS_URL
     Check_File "${CONFIGS}/lockss_cluster"
     ARGS_CLUSTER="-l ${LOCKSS_PROPS_URL} -l ${CONFIGS}/lockss_cluster -l ${CONFIGS}/lockss_cluster_opt"
   else
     #
-    # !LOCKSS_IS_REPO and !LOCKSS_IS_CONFIG
+    # !LOCKSS_IS_CONFIG
     #
     Check_Set "${LOCKSS_CONFIG_URL}" LOCKSS_CONFIG_URL
     Check_Set "${LOCKSS_ADMIN_USER}" LOCKSS_ADMIN_USER
@@ -269,7 +272,6 @@ else
   if [ -n ${LOCKSS_PRESERVATION_GROUP} ]; then
     ARGS_GROUP="-g ${LOCKSS_PRESERVATION_GROUP}"
   fi
-fi
 
 # Sequencing
 
