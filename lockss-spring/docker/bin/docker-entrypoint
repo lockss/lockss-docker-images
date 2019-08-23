@@ -74,6 +74,10 @@ Check_Dir()
     echo "${_0}: directory not found: ${1}"
     Exit 1
   fi
+  if [ ! -w "${1}" ]; then
+    echo "${_0}: directory not writeable: ${1}"
+    Exit 1
+  fi
 }
 
 Check_Executable()
@@ -88,6 +92,10 @@ Check_File()
 {
   if [ ! -f "${1}" ]; then
     echo "${_0}: file not found: ${1}"
+    Exit 1
+  fi
+  if [ ! -r "${1}" ]; then
+    echo "${_0}: file not readable: ${1}"
     Exit 1
   fi
 }
@@ -150,6 +158,12 @@ Wait_For_200()
 }
 
 # Beginning
+Check_Set "${LOCKSS_LOGS}" LOCKSS_LOGS
+Check_Dir "${LOCKSS_LOGS}"
+# redirect stdout and stderr to files
+echo "$(date) Redirecting stdout=>${LOCKSS_LOGS}/stdout.log and stderr ${LOCKSS_LOGS}/stderr.log..."
+exec >${LOCKSS_LOGS}/stdout.log
+exec 2>${LOCKSS_LOGS}/stderr.log
 
 echo "$$" > "${STARTUP_FILE}"
 rm -f "${PID_FILE}"
@@ -173,8 +187,6 @@ Check_Executable 'nc'
 Check_Set "${CONFIGS}"
 Check_Dir "${CONFIGS}"
 
-Check_Set "${LOCKSS_LOGS}" LOCKSS_LOGS
-Check_Dir "${LOCKSS_LOGS}"
 Check_Set "${LOCKSS_DATA}" LOCKSS_DATA
 Check_Dir "${LOCKSS_DATA}"
 Check_Set "${LOCKSS_PIDS}" LOCKSS_PIDS
@@ -225,7 +237,7 @@ else
 
   # Cluster configuration
 
-  echo "$(date) Cluster configuration..."  
+  echo "$(date) Cluster configuration..."
   if [ "${LOCKSS_IS_CONFIG}" = 'true' ]; then
     #
     # !LOCKSS_IS_REPO and LOCKSS_IS_CONFIG
