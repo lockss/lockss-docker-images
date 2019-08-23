@@ -168,7 +168,7 @@ LOCKSS_LOGFILE="${LOCKSS_LOGS}/stdout.log"
 # redirect stdout and stderr to file
 echo "$(date) Redirecting stdout and stderr to ${LOCKSS_LOGFILE}."
 exec >$LOCKSS_LOGFILE
-exec 2>$LOCKSS_LOGFILE
+exec 2>&1
 
 echo "$$" > "${STARTUP_FILE}"
 rm -f "${PID_FILE}"
