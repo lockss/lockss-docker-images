@@ -43,24 +43,9 @@ POSSIBILITY OF SUCH DAMAGE.
     <Property name="log.rollingfile.sizetrigger">10 MB</Property>
     <Property name="log.rollingfile.maxrollover">5</Property>
 
+    <!-- log only FATAL messages to console -->
+    <Property name="level.min.console">FATAL</Property>
+
   </Properties>
-
-  <Appenders>
-
-    <Console name="Console" target="SYSTEM_OUT">
-      <PatternLayout>
-	<Pattern>${DOLLAR}{layout.console}</Pattern>
-      </PatternLayout>
-      <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
-    </Console>
-
-    <Console name="Console.Lockss" target="SYSTEM_OUT">
-      <PatternLayout>
-	<Pattern>${DOLLAR}{layout.console.lockss}</Pattern>
-      </PatternLayout>
-      <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
-    </Console>
-
-  </Appenders>
 
 </Configuration>
