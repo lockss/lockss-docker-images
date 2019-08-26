@@ -274,7 +274,7 @@ fi
 
   # Group configuration
   echo "$(date) Group configuration..."
-  if [ -n ${LOCKSS_PRESERVATION_GROUP} ]; then
+  if [ -n "${LOCKSS_PRESERVATION_GROUP}" ]; then
     ARGS_GROUP="-g ${LOCKSS_PRESERVATION_GROUP}"
   fi
 
@@ -312,6 +312,7 @@ echo "JVM_OPTS_ADDITIONAL=${JVM_OPTS_ADDITIONAL}"
 echo "ARGS_BOOTSTRAP=${ARGS_BOOTSTRAP}"
 echo "ARGS_CLUSTER=${ARGS_CLUSTER}"
 echo "ARGS_SERVICE=${ARGS_SERVICE}"
+echo "ARGS_GROUP=${ARGS_GROUP}"
 echo "ARGS_REPO=${ARGS_REPO}"
 echo "ARGS_ADDITIONAL=${ARGS_ADDITIONAL}"
 echo "$(date) *************** JVM INVOCATION ***************"
