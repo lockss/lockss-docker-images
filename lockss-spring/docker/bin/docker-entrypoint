@@ -274,12 +274,9 @@ fi
 
   # Group configuration
   echo "$(date) Group configuration..."
-  echo "|${LOCKSS_PRESERVATION_GROUP}|"
-  set -x
   if [ -n "${LOCKSS_PRESERVATION_GROUP}" ]; then
     ARGS_GROUP="-g ${LOCKSS_PRESERVATION_GROUP}"
   fi
-  set +x
 
 # Sequencing
 
