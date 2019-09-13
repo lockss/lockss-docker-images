@@ -135,7 +135,7 @@ RUN ipm-update \
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 
-HEALTHCHECK --retries=1 --start-period=60s CMD ["/usr/local/bin/docker-healthcheck"]
+#HEALTHCHECK --retries=1 --start-period=60s CMD ["/usr/local/bin/docker-healthcheck"]
 
 COPY /docker/bin/* /usr/local/bin/
 COPY /docker/lockss/etc.base/* "${LOCKSS_HOME}/etc.base/"
