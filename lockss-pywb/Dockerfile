@@ -62,4 +62,4 @@ COPY /docker/bin/* /usr/local/bin/
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 
-HEALTHCHECK --retries=1 --start-period=60s CMD ["/usr/local/bin/docker-healthcheck"]
+#HEALTHCHECK --retries=1 --start-period=60s CMD ["/usr/local/bin/docker-healthcheck"]
