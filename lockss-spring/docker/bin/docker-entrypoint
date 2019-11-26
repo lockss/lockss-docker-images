@@ -270,7 +270,8 @@ fi
 
   echo "$(date) Service configuration..."
   Check_File "${CONFIGS}/lockss_service"
-  ARGS_SERVICE="-p ${LOCKSS_HOME}/etc/lockss_service_base -p ${CONFIGS}/lockss_service -p ${CONFIGS}/lockss_service_opt"
+  Check_File "${SECRETS}/lockss-auth"
+  ARGS_SERVICE="-p ${LOCKSS_HOME}/etc/lockss_service_base -p ${CONFIGS}/lockss_service -p ${CONFIGS}/lockss_service_opt -r ${SECRETS}/lockss-auth"
 
   # Group configuration
   echo "$(date) Group configuration..."
