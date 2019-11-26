@@ -37,12 +37,7 @@ ENV LOCKSS_WAIT_FOR_PORT_TIMEOUT=3 \
     LOCKSS_WAIT_FOR_PORT_SLEEP=10 \
     LOCKSS_WAIT_FOR_200_TIMEOUT=3 \
     LOCKSS_WAIT_FOR_200_SLEEP=10 \
-    WAYBACK_HOME=/usr/local/tomcat/webapps/ROOT/WEB-INF \
-    WAYBACK_BASEDIR=/data \
-    WAYBACK_URL_SCHEME=http \
-    WAYBACK_URL_HOST=localhost \
-    WAYBACK_URL_PORT=8080 \
-    WAYBACK_URL_PREFIX=http://localhost:8080
+    OPENWB_COLLECTION=lockss
 
 # Inherit IPM from lockss-debian
 COPY --from=lockss-debian /usr/local/etc/ipm/* /usr/local/etc/ipm/
@@ -56,8 +51,7 @@ RUN ipm-update \
                 netcat \
  && ipm-clean
 
-COPY /docker/wayback/etc/RemoteCollection.xml.tpl /usr/local/share/wayback/etc/
-COPY /docker/wayback/etc/wayback.xml /usr/local/share/wayback/etc/
+COPY /docker/openwayback/* /usr/local/share/lockss-openwayback/
 COPY /docker/bin/* /usr/local/bin/
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]

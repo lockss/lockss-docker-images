@@ -42,7 +42,7 @@ Apply_Config()
     && for f in $(find . -type f -name '*.tpl'); do
          envsubst < "${f}" > "$(dirname "${f}")/$(basename "${f}" '.tpl')"
        done \
-    && cd "${PYWB_HOME}" \
+    && cd "${WAYBACK_HOME}" \
     && ( cd "${TMP}" && tar cf - --exclude '*.tpl' . ) | tar xf -
     RET=$?
     rm -rf "${TMP}"
@@ -138,17 +138,13 @@ Check_Set "${OPENWB_PORT}" OPENWB_PORT
 Check_Set "${REPO_HOST}" REPO_HOST
 Check_Set "${REPO_REST_PORT}" REPO_REST_PORT
 
-Check_Set "${INIT_COLLECTION}"
-Check_Dir "${VOLUME_DIR}"
+Check_Set "${OPENWB_COLLECTION	}"
 
 # Layer configuration
 
 echo "$(date) Layering configuration..."
-Apply_Config /usr/local/share/wayback/etc
+Apply_Config /usr/local/share/lockss-openwayback
 echo "$(date) Done layering configuration."
-
-echo "$(date) Copying configuration to ${VOLUME_DIR}..."
-cp "${OPENWB_HOME}/wayback.xml" "${OPENWB_HOME}/wayback-webapp/src/main/webapp/" "${VOLUME_DIR}"
 
 # Sequencing
 
@@ -161,5 +157,5 @@ if [ -n "${LOCKSS_WAIT_FOR_200}" ]; then
 fi
 
 # Invoke (exec) the original iipc/openwayback entrypoint;
-cd "${VOLUME_DIR}"
-exec "${OPENWB_HOME}/docker-entrypoint.sh"
+cd "${CATALINA_HOME}"
+exec catalina.sh run
