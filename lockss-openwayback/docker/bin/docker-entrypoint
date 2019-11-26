@@ -137,7 +137,7 @@ Check_Set "${OPENWB_COLLECTION}" OPENWB_COLLECTION
 Check_Set "${REPO_HOST}" REPO_HOST
 Check_Set "${REPO_REST_PORT}" REPO_REST_PORT
 
-Check_Set "${OPENWB_COLLECTION	}"
+Check_Set "${OPENWB_COLLECTION}"
 
 # Layer configuration
 
