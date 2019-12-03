@@ -29,7 +29,7 @@
 
 collections:
     lockss:
-        archive_paths: http://${REPO_HOST}:${REPO_REST_PORT}/warcs/
+        archive_paths: http://${REPO_AUTH}@${REPO_HOST}:${REPO_REST_PORT}/warcs/
         index:
             type: cdx
             api_url: http://${REPO_AUTH}@${REPO_HOST}:${REPO_REST_PORT}/cdx/pywb/lockss?url={url}&matchType={matchType}&sort={sort}&closest={closest}&output={output}&fl={fl}
