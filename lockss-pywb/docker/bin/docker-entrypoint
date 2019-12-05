@@ -161,7 +161,7 @@ Check_Dir "${VOLUME_DIR}"
 
 Check_Set "${SECRETS}" SECRETS
 Check_File "${SECRETS}/lockss-auth"
-export REPO_AUTH="$(Url_Encode "$(cut -d : -f 1 "${SECRETS}/lockss-auth")"):$(Url_Encode "$(cut -d : -f 2 "${SECRETS}/lockss-auth")")"
+export REPO_AUTH="$(Url_Encode "$(cut -d : -f 1 "${SECRETS}/lockss-auth")"):$(Url_Encode "$(cut -d : -f 2- "${SECRETS}/lockss-auth")")"
 
 # Layer configuration
 
