@@ -302,6 +302,10 @@ export LOG4J_LOCKSS_CONFIG="${LOCKSS_HOME}/etc/log4j2-lockss-container.xml"
 # Launch service
 
 echo "$(date) Launching service..."
+
+cd "${LOCKSS_TMP}"
+echo "$(date) Working directory: $(pwd)"
+
 echo "$(date) Launch parameters:"
 java -version
 echo "JAVA_HOME=${JAVA_HOME}"
@@ -316,6 +320,7 @@ echo "ARGS_SERVICE=${ARGS_SERVICE}"
 echo "ARGS_GROUP=${ARGS_GROUP}"
 echo "ARGS_REPO=${ARGS_REPO}"
 echo "ARGS_ADDITIONAL=${ARGS_ADDITIONAL}"
+
 echo "$(date) *************** JVM INVOCATION ***************"
 echo "$$" > "${PID_FILE}"
 rm -f "${STARTUP_FILE}"
