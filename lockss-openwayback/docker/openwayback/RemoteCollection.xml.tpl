@@ -32,13 +32,13 @@
 
     <property name="resourceStore">
       <bean class="org.archive.wayback.resourcestore.SimpleResourceStore">
-        <property name="prefix" value="http://${REPO_HOST}:${REPO_REST_PORT}/fileproxy/" />
+        <property name="prefix" value="http://${REPO_AUTH}@${REPO_HOST}:${REPO_REST_PORT}/fileproxy/" />
       </bean>
     </property>
 
     <property name="resourceIndex">
       <bean class="org.archive.wayback.resourceindex.RemoteResourceIndex">
-        <property name="searchUrlBase" value="http://${REPO_HOST}:${REPO_REST_PORT}/cdx/owb/${OPENWB_COLLECTION}" />
+        <property name="searchUrlBase" value="http://${REPO_AUTH}@${REPO_HOST}:${REPO_REST_PORT}/cdx/owb/${OPENWB_COLLECTION}" />
       </bean>
     </property>
   </bean>
