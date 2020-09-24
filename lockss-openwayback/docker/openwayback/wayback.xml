@@ -20,7 +20,7 @@
         wayback.basedir.default=/tmp/openwayback
         wayback.url.scheme.default=http
         wayback.url.host.default=localhost
-        wayback.url.port.default=8080
+        wayback.url.port.default=8080 <!-- 8888 -->
 
         <!-- Environment variables (if present) override defaults. No need to customize these. -->
         wayback.basedir=#{ systemEnvironment['WAYBACK_BASEDIR'] ?: '${wayback.basedir.default}' }
@@ -74,14 +74,12 @@
 	The ResourceFileLocationDB implementation to use for mapping ARC/WARC names
 	to absolute paths/URLs via a BDBJE database.
 -->
-<!--
   <bean id="resourcefilelocationdb" class="org.archive.wayback.resourcestore.locationdb.BDBResourceFileLocationDB">
     <property name="bdbPath" value="${wayback.basedir}/file-db/db/" />
     <property name="bdbName" value="DB1" />
     <property name="logPath" value="${wayback.basedir}/file-db/db.log" />
   </bean>
 
--->
 <!--
 	The following bean provides an alternate flat-file based LocationDB
 	implementation.
