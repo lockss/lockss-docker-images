@@ -1,4 +1,4 @@
-# Copyright (c) 2000-2019, Board of Trustees of Leland Stanford Jr. University
+# Copyright (c) 2000-2020, Board of Trustees of Leland Stanford Jr. University
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -121,7 +121,7 @@ ENV LOCKSS_WAIT_FOR_PORT_TIMEOUT=5 \
     LOCKSS_HOME=/usr/local/share/lockss \
     LOCKSS_PIDS=/var/run \
     LOCKSS_DATA=/data \
-    LOCKSS_TMP=/data/temp \
+    LOCKSS_TMP=/tmp/lockss \
     LOCKSS_LOGS=/var/log/lockss
 
 WORKDIR /tmp

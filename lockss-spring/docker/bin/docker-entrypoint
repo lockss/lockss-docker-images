@@ -34,6 +34,7 @@ _0="$(basename "${0}")"
 JVM_OPTS_DOCKER='-XX:+StartAttachListener -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap'
 JVM_OPTS_LOGGING='-Dorg.lockss.defaultLogLevel=debug -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -Dorg.springframework.boot.logging.LoggingSystem=none'
 JVM_OPTS_TMP="-Djava.io.tmpdir=${LOCKSS_TMP}"
+LOCKSS_TMP_TRASH="${LOCKSS_TMP}/../lockss-trash"
 LOCKSS_JAR="${LOCKSS_HOME}/lib/lockss.jar"
 STARTUP_FILE="${LOCKSS_PIDS}/lockss.startup"
 PID_FILE="${LOCKSS_PIDS}/lockss.pid"
@@ -106,6 +107,16 @@ Check_Set()
     echo "${_0}: environment variable not set: ${2}"
     Exit 1
   fi
+}
+
+Temp_Dir_Cleanup()
+{
+  echo "$(date) Temporary directory cleanup..."
+  mkdir -p "${LOCKSS_TMP_TRASH}"
+  TRASH="$(mktemp -d -p "${LOCKSS_TMP_TRASH}")"
+  mv "${LOCKSS_TMP}" "${TRASH}"
+  mkdir -p "${LOCKSS_TMP}"
+  ( cd "${LOCKSS_TMP_TRASH}" && rm -rf ./* ) &
 }
 
 # $1=input
@@ -291,11 +302,9 @@ fi
 
 # Temp directory handling
 
-echo "$(date) Temporary directory handling..."
-OLDTMP="$(mktemp -d -p "${LOCKSS_DATA}")"
-mv "${LOCKSS_TMP}" "${OLDTMP}"
-mkdir -p "${LOCKSS_TMP}"
-( cd "${OLDTMP}" && rm -rf * && rmdir "${OLDTMP}" ) &
+Temp_Dir_Cleanup
+
+# Log4j config
 
 export LOG4J_LOCKSS_CONFIG="${LOCKSS_HOME}/etc/log4j2-lockss-container.xml"
 
