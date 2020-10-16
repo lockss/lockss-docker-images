@@ -32,7 +32,7 @@
 
     <property name="resourceStore">
       <bean class="org.archive.wayback.resourcestore.SimpleResourceStore">
-        <property name="prefix" value="http://${REPO_HOST}:${REPO_REST_PORT}/fileproxy/" />
+        <property name="prefix" value="http://${REPO_HOST}:${REPO_REST_PORT}/warcs/" />
       </bean>
     </property>
 
