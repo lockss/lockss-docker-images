@@ -1,0 +1,189 @@
+#!/usr/bin/env bash
+
+# Copyright (c) 2000-2019, Board of Trustees of Leland Stanford Jr. University
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# 1. Redistributions of source code must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Neither the name of the copyright holder nor the names of its contributors
+# may be used to endorse or promote products derived from this software without
+# specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
+_0="$(basename "${0}")"
+
+STARTUP_FILE="${HADOOP_PIDS}/hadoop.startup"
+
+SUBPID=''
+
+# $1=exitcode
+Exit()
+{
+  echo " * Exiting (${1})..."
+  rm -f "${STARTUP_FILE}"
+  exit "${1}"
+}
+
+Apply_Config()
+{
+  echo "$(date) Applying config from ${1}..."
+  if [ -d "${1}" ]; then
+    : \
+    && TMP=$(mktemp -d) \
+    && cd "${TMP}" \
+    && ( cd "${1}" && tar cf - . ) | tar xf - \
+    && for f in $(find . -type f -name '*.tpl'); do
+         envsubst < "${f}" > "$(dirname "${f}")/$(basename "${f}" '.tpl')"
+       done \
+    && cd "${HADOOP_HOME}/etc/hadoop" \
+    && ( cd "${TMP}" && tar cf - --exclude '*.tpl' . ) | tar xf -
+    RET=$?
+    rm -rf "${TMP}"
+    echo "$(date) Done applying config from ${1}."
+    return $RET
+  else
+    echo "$(date) No config directory ${1}."
+    return 0
+  fi
+}
+
+Check_Dir()
+{
+  if [ ! -d "${1}" ]; then
+    echo "${_0}: ${1} is missing"
+    Exit 1
+  fi
+}
+
+Check_Executable()
+{
+  if ! command -v "${1}" > /dev/null 2>&1 ; then
+    echo "${_0}: ${1} not on the PATH (${PATH})"
+    Exit 1
+  fi
+}
+
+Trap_TERM()
+{
+  echo "$(date) Signal caught: TERM"
+  trap - TERM
+  for f in "${HADOOP_PIDS}/hadoop-"*.pid ; do
+    if [ -f "${f}" ]; then
+      p="$(cat "${f}")"
+      echo "$(date) Sending TERM to ${p} (${f})"
+      kill -TERM "${p}"
+      echo "$(date) Waiting for ${p}..."
+      while kill -0 "${p}" 2> /dev/null ; do sleep 0.5 ; done
+      echo "$(date) Done waiting for ${p}."
+    fi
+  done
+  if [ -n "${SUBPID}" ]; then
+    echo "$(date) Sending TERM to ${SUBPID} (background)"  
+    kill -TERM "${SUBPID}"
+    echo "$(date) Waiting for ${SUBPID}..."
+    wait "${SUBPID}"
+    echo "$(date) Done waiting for ${SUBPID}."
+  fi
+  echo "$(date) Sending TERM to $$ (self)"
+  kill -TERM $$
+}
+
+# Use USR1 to cause ps to run
+Trap_USR1()
+{
+  echo "$(date) Signal caught: USR1"
+  ps
+}
+
+
+trap 'Trap_TERM' TERM
+trap 'Trap_USR1' USR1
+
+# Beginning
+
+echo "$$" > "${STARTUP_FILE}"
+rm -f "${HADOOP_PIDS}/hadoop-"*.pid
+echo "$(date) *************** CONTAINER ENTRY POINT ***************"
+echo "$(date) Beginning execution..."
+echo "$(date) Environment:"
+env
+
+# Sanity checks
+
+echo "$(date) Sanity checks..."
+
+Check_Executable 'date'
+Check_Executable 'envsubst'
+Check_Executable 'lockss-hdfs-launch-sshd'
+
+Check_Dir "${HADOOP_LOGS}"
+Check_Dir "${HADOOP_DATA}"
+
+# SSH server
+
+echo "$(date) Launching SSH server..."
+lockss-hdfs-launch-sshd &
+SUBPID=$!
+wait "${SUBPID}" || Exit 1
+SUBPID=''
+echo "$(date) Done launching SSH server."
+
+# Layering configuration
+
+echo "$(date) Layering configuration..."
+mkdir -p "${HADOOP_HOME}/etc/hadoop"
+Apply_Config "${HADOOP_HOME}/etc.orig/hadoop" || Exit 1
+Apply_Config "${HADOOP_HOME}/etc.base/hadoop" || Exit 1
+Apply_Config "${HADOOP_CONF}" || Exit 1
+echo "$(date) Done layering configuration."
+
+# Maybe format namenode
+
+if [ ! -f "${HADOOP_DATA}/dfs/name/current/VERSION" ]; then
+  echo "$(date) Formatting HDFS namenode..."
+  ( yes n | "${HADOOP_HOME}/bin/hdfs" namenode -format )
+else
+  echo "$(date) Not Formatting HDFS namenode"
+fi
+
+# Launch
+
+echo "$(date) *************** LAUNCH ***************"
+java -version
+"${HADOOP_HOME}/sbin/start-dfs.sh" &
+SUBPID=$!
+wait "${SUBPID}" || Exit 1
+SUBPID=''
+echo "$(date) Done launching."
+
+rm -f "${STARTUP_FILE}"
+
+echo "$(date) Finishing entry point..."
+echo "$(date) PIDs:"
+cat "${HADOOP_PIDS}/hadoop-"*.pid
+
+while true ; do
+  tail -f /dev/null &
+  SUBPID=$!
+  wait "${SUBPID}"
+  SUBPID=''
+done

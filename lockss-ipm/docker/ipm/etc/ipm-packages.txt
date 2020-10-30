@@ -1,0 +1,37 @@
+awk	The Awk pattern matching language
+bash	The GNU Bourne Again shell
+bzip2	A high-quality data compression program
+coreutils	GNU core utilities (https://en.wikipedia.org/wiki/List_of_GNU_Core_Utilities_commands)
+curl	URL retrieval utility and library
+dnsutils	DNS utilities (host, nslookup, dig, delv...)
+emacs	The extensible, customizable, self-documenting real-time display editor
+file	File type identification utility
+findutils	GNU utilities for finding files (find, xargs...)
+gettext	GNU locale utilities
+gnupg	GNU Privacy Guard 2 - a PGP replacement tool
+grep	Pattern matching utilities
+gzip	A popular data compression program
+jq	A lightweight and flexible command-line JSON processor
+less	File pager
+links	Web browser running in both graphics and text mode
+lynx	Cross-platform text-based browser
+mtr	Full screen ncurses traceroute tool
+nano	Enhanced clone of the Pico text editor
+netcat	The TCP/IP swiss army knife
+openjdk8	OpenJDK 8 (JDK)
+openjdk8-jre	OpenJDK 8 (JRE)
+openssh-client	OpenBSD SSH client
+openssh-server	OpenBSD SSH server
+pdsh	A high performance, parallel remote shell utility
+ping	Tools to test the reachability of network hosts
+pkzip	PKZIP utilities (zip, unzip)
+python2	A high-level scripting language (2.x)
+python3	A high-level scripting language (3.x)
+rsync	A file transfer program to keep remote files in sync
+sed	GNU stream editor
+tar	Utility used to store, backup, and transport files
+tcpdump	A tool for network monitoring and data acquisition
+traceroute	Traces the route taken by packets over an IPv4/IPv6 network
+vim	Improved vi-style text editor
+wget	A network utility to retrieve files from the Web
+which	A utility to show the full path of commands
