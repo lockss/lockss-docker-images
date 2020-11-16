@@ -122,8 +122,9 @@ ENV LOCKSS_WAIT_FOR_PORT_TIMEOUT=5 \
     LOCKSS_PIDS=/var/run \
     LOCKSS_DATA=/data \
     LOCKSS_TMP=/tmp/lockss \
-    LOCKSS_LOGS=/var/log/lockss
-
+    LOCKSS_LOGS=/var/log/lockss \
+    LOCKSS_UID=9000 \
+    LOCKSS_GID=9000
 WORKDIR /tmp
 
 RUN ipm-update \
@@ -132,6 +133,13 @@ RUN ipm-update \
                 jq \
                 netcat \
  && ipm-clean
+
+#Add the lockss user and group
+RUN groupadd -g LOCKSS_GID lockss && \
+    useradd -r -u LOCKSS_UID -g lockss lockss
+
+#Run Container as lockss
+USER lockss
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 
