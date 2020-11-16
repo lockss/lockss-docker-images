@@ -169,6 +169,9 @@ Wait_For_200()
 }
 
 # Beginning
+# Make sure the user and group for lockss are defined
+Check_Set "${LOCKSS_UID}" LOCKSS_UID
+Check_Set "${LOCKSS_GID}" LOCKSS_GID
 
 # Sanity check for stdout/stderr logging
 Check_Set "${LOCKSS_LOGS}" LOCKSS_LOGS
