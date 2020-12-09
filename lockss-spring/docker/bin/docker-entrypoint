@@ -109,6 +109,18 @@ Check_Set()
   fi
 }
 
+Check_Valid_User()
+{
+  if [ "${LOCKSS_UID}" -eq 999 ]; then
+    echo "${_0}: environment variable LOCKSS_UID not set.}"
+    Exit 1
+  fi
+  if ["${LOCKSS_GID}" -eq 999]; then
+    echo "${_0}: environment variable LOCKSS_GID not set.}"
+    Exit 1
+  fi
+}
+
 Temp_Dir_Cleanup()
 {
   echo "$(date) Temporary directory cleanup..."
@@ -169,9 +181,6 @@ Wait_For_200()
 }
 
 # Beginning
-# Make sure the user and group for lockss are defined
-Check_Set "${LOCKSS_UID}" LOCKSS_UID
-Check_Set "${LOCKSS_GID}" LOCKSS_GID
 
 # Sanity check for stdout/stderr logging
 Check_Set "${LOCKSS_LOGS}" LOCKSS_LOGS
@@ -195,13 +204,15 @@ env | sort
 # Sanity checks
 
 echo "$(date) Sanity checks..."
-
 Check_Executable 'awk'
 Check_Executable 'curl'
 Check_Executable 'date'
 Check_Executable 'envsubst'
 Check_Executable 'java'
 Check_Executable 'nc'
+
+Check_Set "${LOCKSS_UID}" LOCKSS_UID
+Check_Set "${LOCKSS_GID}" LOCKSS_GID
 
 Check_Set "${CONFIGS}"
 Check_Dir "${CONFIGS}"

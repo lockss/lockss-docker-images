@@ -123,8 +123,9 @@ ENV LOCKSS_WAIT_FOR_PORT_TIMEOUT=5 \
     LOCKSS_DATA=/data \
     LOCKSS_TMP=/tmp/lockss \
     LOCKSS_LOGS=/var/log/lockss \
-    LOCKSS_UID=9000 \
-    LOCKSS_GID=9000
+    LOCKSS_USER=lockss \
+    LOCKSS_GROUP=lockss
+
 WORKDIR /tmp
 
 RUN ipm-update \
@@ -134,12 +135,22 @@ RUN ipm-update \
                 netcat \
  && ipm-clean
 
-#Add the lockss user and group
-RUN groupadd -g LOCKSS_GID lockss && \
-    useradd -r -u LOCKSS_UID -g lockss lockss
+#Add the lockss user and group alpine req addgroup/adduser
+RUN if [ ! -z $LOCKSS_UID ] && [ ! -z $LOCKSS_GID ]; then \
+ addgroup --system \
+          --gid "$LOCKSS_GID" \
+          "$LOCKSS_GROUP" \
+ && adduser  --system \
+          --no-create-home \
+          --disabled-password \
+          --gecos "LOCKSS USER" \
+          --uid "$LOCKSS_UID" \
+          --ingroup "$LOCKSS_GROUP" \
+          "$LOCkSS_USER"
 
-#Run Container as lockss
-USER lockss
+  #change to newly created LOCKSS_USER
+USER $LOCKSS_USER:$LOCKSS_GROUP
+fi
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 
