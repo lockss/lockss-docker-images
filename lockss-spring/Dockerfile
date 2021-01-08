@@ -136,7 +136,7 @@ RUN ipm-update \
  && ipm-clean
 
 #Add the lockss user and group alpine req addgroup/adduser
-RUN if [ ! -z $LOCKSS_UID ] && [ ! -z $LOCKSS_GID ]; then \
+RUN if [! -z $LOCKSS_UID ] && [ ! -z $LOCKSS_GID ]; then \
  addgroup --system \
           --gid "$LOCKSS_GID" \
           "$LOCKSS_GROUP" \
@@ -146,11 +146,12 @@ RUN if [ ! -z $LOCKSS_UID ] && [ ! -z $LOCKSS_GID ]; then \
           --gecos "LOCKSS USER" \
           --uid "$LOCKSS_UID" \
           --ingroup "$LOCKSS_GROUP" \
-          "$LOCkSS_USER"
-
-  #change to newly created LOCKSS_USER
-USER $LOCKSS_USER:$LOCKSS_GROUP
+          "$LOCKSS_USER"; \
+else \
+    echo "LOCKSS_UID and GROUP_ID are not defined."; \
 fi
+
+USER $LOCKSS_USER:$LOCKSS_GROUP
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 
