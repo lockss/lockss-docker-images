@@ -135,24 +135,6 @@ RUN ipm-update \
                 netcat \
  && ipm-clean
 
-#Add the lockss user and group alpine req addgroup/adduser
-RUN if [! -z $LOCKSS_UID ] && [ ! -z $LOCKSS_GID ]; then \
- addgroup --system \
-          --gid "$LOCKSS_GID" \
-          "$LOCKSS_GROUP" \
- && adduser  --system \
-          --no-create-home \
-          --disabled-password \
-          --gecos "LOCKSS USER" \
-          --uid "$LOCKSS_UID" \
-          --ingroup "$LOCKSS_GROUP" \
-          "$LOCKSS_USER"; \
-else \
-    echo "LOCKSS_UID and GROUP_ID are not defined."; \
-fi
-
-USER $LOCKSS_USER:$LOCKSS_GROUP
-
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 
 #HEALTHCHECK --retries=1 --start-period=60s CMD ["/usr/local/bin/docker-healthcheck"]
