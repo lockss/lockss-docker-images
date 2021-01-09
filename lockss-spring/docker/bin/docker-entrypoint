@@ -109,18 +109,6 @@ Check_Set()
   fi
 }
 
-Check_Valid_User()
-{
-  if [ "${LOCKSS_UID}" -eq 999 ]; then
-    echo "${_0}: environment variable LOCKSS_UID not set.}"
-    Exit 1
-  fi
-  if ["${LOCKSS_GID}" -eq 999]; then
-    echo "${_0}: environment variable LOCKSS_GID not set.}"
-    Exit 1
-  fi
-}
-
 Temp_Dir_Cleanup()
 {
   echo "$(date) Temporary directory cleanup..."
@@ -180,7 +168,28 @@ Wait_For_200()
   echo "$(date) Done waiting for HTTP 200 responses."
 }
 
+Set_User()
+{
+ addgroup --system \
+          --gid "$LOCKSS_GID" \
+          "$LOCKSS_GROUP" \
+ && adduser  --system \
+          --no-create-home \
+          --disabled-password \
+          --gecos "LOCKSS USER" \
+          --uid "$LOCKSS_UID" \
+          --ingroup "$LOCKSS_GROUP" \
+          "$LOCKSS_USER"
+ su - "$LOCKSS_USER"
+}
 # Beginning
+
+#Setup the lockss user and group first
+Check_Set "${LOCKSS_GROUP}" LOCKSS_GROUP
+Check_Set "${LOCKSS_GID}" LOCKSS_GID
+Check_Set "${LOCKSS_USER}" LOCKSS_USER
+Check_Set "${LOCKSS_UID}" LOCKSS_UID
+Set_User
 
 # Sanity check for stdout/stderr logging
 Check_Set "${LOCKSS_LOGS}" LOCKSS_LOGS
@@ -210,9 +219,6 @@ Check_Executable 'date'
 Check_Executable 'envsubst'
 Check_Executable 'java'
 Check_Executable 'nc'
-
-Check_Set "${LOCKSS_UID}" LOCKSS_UID
-Check_Set "${LOCKSS_GID}" LOCKSS_GID
 
 Check_Set "${CONFIGS}"
 Check_Dir "${CONFIGS}"
