@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (c) 2000-2019, Board of Trustees of Leland Stanford Jr. University
+# Copyright (c) 2000-2021, Board of Trustees of Leland Stanford Jr. University
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -54,25 +54,40 @@ Check_Set()
   fi
 }
 
-# Beginning
+################################################################################
+# Main
+################################################################################
 
-#Setup the lockss user and group first
+# Identify script
+
+echo "$(date): start of ${_0}"
+
+# Check root
+
+if [ "$(whoami)" != 'root' ]; then
+  echo "This script should be run as root"
+  Exit 1
+fi
+
+# Setup the lockss user and group first
+
 Check_Set "${LOCKSS_GROUP}" LOCKSS_GROUP
 Check_Set "${LOCKSS_GID}" LOCKSS_GID
 Check_Set "${LOCKSS_USER}" LOCKSS_USER
 Check_Set "${LOCKSS_UID}" LOCKSS_UID
 
- addgroup --system \
-          --gid "$LOCKSS_GID" \
-          "$LOCKSS_GROUP" \
- && adduser  --system \
-          --disabled-password \
-          --gecos "LOCKSS USER" \
-          --uid "$LOCKSS_UID" \
-          --ingroup "$LOCKSS_GROUP" \
-          --shell "/bin/sh" \
-          "$LOCKSS_USER"
+addgroup --system \
+         --gid "${LOCKSS_GID}" \
+         "${LOCKSS_GROUP}" \
+&& adduser --system \
+           --disabled-password \
+           --gecos 'LOCKSS User' \
+           --uid "${LOCKSS_UID}" \
+           --ingroup "${LOCKSS_GROUP}" \
+           --shell "/bin/sh" \
+           "${LOCKSS_USER}"
+
+# Invoke lockss-entrypoint
 
 export OLDPATH="${PATH}"
-
-su "$LOCKSS_USER" -p -c /usr/local/bin/lockss-entrypoint
+su "${LOCKSS_USER}" -p -c /usr/local/bin/lockss-entrypoint
