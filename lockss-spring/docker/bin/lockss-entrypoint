@@ -74,7 +74,7 @@ Check_Dir()
 {
   Check_Dir_Read "${1}"
   if [ ! -w "${1}" ]; then
-    echo "${_0}: directory not readable: ${1}"
+    echo "${_0}: directory not writeable: ${1}"
     Exit 1
   fi
 }
