@@ -74,5 +74,5 @@ Check_Set "${LOCKSS_UID}" LOCKSS_UID
           "$LOCKSS_USER"
 
 export OLDPATH="${PATH}"
-echo "${_0}: OLDPATH: ${OLDPATH}"
+
 su "$LOCKSS_USER" -p -c /usr/local/bin/lockss-entrypoint

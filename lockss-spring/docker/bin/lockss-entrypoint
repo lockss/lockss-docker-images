@@ -168,8 +168,6 @@ Wait_For_200()
   echo "$(date) Done waiting for HTTP 200 responses."
 }
 
-echo "${_0}: PATH: ${PATH}"
-
 # Sanity check for stdout/stderr logging
 Check_Set "${LOCKSS_LOGS}" LOCKSS_LOGS
 Check_Dir "${LOCKSS_LOGS}"
