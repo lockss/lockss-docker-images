@@ -75,10 +75,23 @@ Check_Dir()
     echo "${_0}: directory not found: ${1}"
     Exit 1
   fi
-  if [ ! -w "${1}" ]; then
+  if [ ! - "${1}" ]; then
     echo "${_0}: directory not writeable: ${1}"
     Exit 1
   fi
+}
+
+Check_Readable_Dir()
+{
+  if [ ! -d "${1}" ]; then
+    echo "${_0}: directory not found: ${1}"
+    Exit 1
+  fi
+  if [ ! -r "${1}" ]; then
+    echo "${_0}: directory not readable: ${1}"
+    Exit 1
+  fi
+
 }
 
 Check_Executable()
@@ -198,7 +211,7 @@ Check_Executable 'java'
 Check_Executable 'nc'
 
 Check_Set "${CONFIGS}"
-Check_Dir "${CONFIGS}"
+Check_Readable_Dir "${CONFIGS}"
 
 Check_Set "${LOCKSS_DATA}" LOCKSS_DATA
 Check_Dir "${LOCKSS_DATA}"
@@ -268,7 +281,7 @@ fi
     Check_Set "${LOCKSS_CONFIG_URL}" LOCKSS_CONFIG_URL
     Check_Set "${LOCKSS_ADMIN_USER}" LOCKSS_ADMIN_USER
     Check_Set "${SECRETS}"
-    Check_Dir "${SECRETS}"
+    Check_Readable_Dir "${SECRETS}"
     Check_File "${SECRETS}/lockss_ui_pass"
 #    LOCKSS_CONFIG_URL="${LOCKSS_CONFIG_URL%%://*}://$(Url_Encode "${LOCKSS_ADMIN_USER}"):$(Url_Encode "$(cat "${SECRETS}/lockss_ui_pass")")@${LOCKSS_CONFIG_URL#*://}"
     ARGS_CLUSTER="-c ${LOCKSS_CONFIG_URL} -l ${LOCKSS_CONFIG_URL}/config/file/cluster"
