@@ -246,7 +246,7 @@ Check_Dir_Read "${CONFIGS}"
 Check_Set "${LOCKSS_DATA}" LOCKSS_DATA
 Check_Dir "${LOCKSS_DATA}"
 Check_Set "${LOCKSS_PIDS}" LOCKSS_PIDS
-Check_Dir "${LOCKSS_PIDS}"
+#Check_Dir "${LOCKSS_PIDS}" # FIXME: let the creation of PID files fail for now
 
 Check_Set "${LOCKSS_HOME}" LOCKSS_HOME
 Check_Dir "${LOCKSS_HOME}"
