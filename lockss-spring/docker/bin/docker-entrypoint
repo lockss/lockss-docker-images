@@ -46,6 +46,81 @@ Exit()
   exit "${1}"
 }
 
+Apply_Config()
+{
+  echo "$(date) Applying config from ${1}..."
+  if [ -d "${1}" ]; then
+    : \
+    && TMP=$(mktemp -d) \
+    && cd "${TMP}" \
+    && ( cd "${1}" && tar cf - . ) | tar xf - \
+    && for f in $(find . -type f -name '*.tpl'); do
+         DOLLAR='$' envsubst < "${f}" > "$(dirname "${f}")/$(basename "${f}" '.tpl')"
+       done \
+    && cd "${LOCKSS_HOME}/etc" \
+    && ( cd "${TMP}" && tar cf - --exclude '*.tpl' . ) | tar xf -
+    RET=$?
+    rm -rf "${TMP}"
+    echo "$(date) Done applying config from ${1}."
+    return $RET
+  else
+    echo "$(date) No config directory ${1}."
+    return 0
+  fi
+}
+
+# Checks that $1 is -e, -d, -r and -w
+Check_Dir()
+{
+  Check_Dir_Read "${1}"
+  if [ ! -w "${1}" ]; then
+    echo "${_0}: directory not writeable: ${1}"
+    Exit 1
+  fi
+}
+
+# Checks that $1 is -e, -d and -r
+Check_Dir_Read()
+{
+  if [ ! -e "${1}" ]; then
+    echo "${_0}: directory not found: ${1}"
+    Exit 1
+  fi
+  if [ ! -d "${1}" ]; then
+    echo "${_0}: not a directory: ${1}"
+    Exit 1
+  fi
+  if [ ! -r "${1}" ]; then
+    echo "${_0}: directory not readable: ${1}"
+    Exit 1
+  fi
+
+}
+
+Check_Executable()
+{
+  if ! which "${1}" > /dev/null 2>&1 ; then
+    echo "${_0}: PATH executable not found: ${1}"
+    Exit 1
+  fi
+}
+
+Check_File()
+{
+  if [ ! -e "${1}" ]; then
+    echo "${_0}: file not found: ${1}"
+    Exit 1
+  fi
+  if [ ! -f "${1}" ]; then
+    echo "${_0}: not a file: ${1}"
+    Exit 1
+  fi
+  if [ ! -r "${1}" ]; then
+    echo "${_0}: file not readable: ${1}"
+    Exit 1
+  fi
+}
+
 Check_Set()
 {
   if [ -z "${1}" ]; then
@@ -54,40 +129,249 @@ Check_Set()
   fi
 }
 
-################################################################################
-# Main
-################################################################################
+Temp_Dir_Cleanup()
+{
+  echo "$(date) Temporary directory cleanup..."
+  mkdir -p "${LOCKSS_TMP_TRASH}"
+  TRASH="$(mktemp -d -p "${LOCKSS_TMP_TRASH}")"
+  mv "${LOCKSS_TMP}" "${TRASH}"
+  mkdir -p "${LOCKSS_TMP}"
+  ( cd "${LOCKSS_TMP_TRASH}" && rm -rf ./* ) &
+}
 
-# Identify script
+# $1=input
+Url_Encode()
+{
+  echo -n "${1}" | awk '
+    BEGIN {
+      for (i = 0 ; i < 256 ; ++i) {
+        ord[sprintf("%c", i)] = i
+      }
+    }
+    {
+      for (i = 1 ; i <= length($0) ; i++) {
+        c = substr($0, i, 1) ;
+        printf("%s", (c ~ /[-._~a-zA-Z0-9]/) ? c : sprintf("%%%02X", ord[c]))
+      }
+    }
+  '
+}
 
-echo "$(date): start of ${_0}"
+# $1=space separated string of host:port pairs
+Wait_For_Port()
+{
+  echo "$(date) Starting wait for port on: $@"
+  for hostport in $@ ; do
+    echo "$(date) Waiting for port on ${hostport}..."
+    host="${hostport%%:*}"
+    port="${hostport#*:}"
+    until nc -z -w "${LOCKSS_WAIT_FOR_PORT_TIMEOUT}" "${host}" "${port}" ; do
+      sleep "${LOCKSS_WAIT_FOR_PORT_SLEEP}"
+    done
+    echo "$(date) Done waiting for port on ${hostport}."
+  done
+  echo "$(date) Done waiting for ports."
+}
 
-# Check root
+# $1=space separated string of host:port pairs
+Wait_For_200()
+{
+  echo "$(date) Starting wait for HTTP 200 responses from: $@"
+  for hostport in $@ ; do
+    url="http://${hostport}/status"
+    echo "$(date) Waiting for HTTP 200 response from ${url}..."
+    until curl --silent --max-time "${LOCKSS_WAIT_FOR_200_TIMEOUT}" --location "${url}" ; do
+      sleep "${LOCKSS_WAIT_FOR_200_SLEEP}"
+    done
+    echo "$(date) Done waiting for HTTP 200 response from ${url}."
+  done
+  echo "$(date) Done waiting for HTTP 200 responses."
+}
 
-if [ "$(whoami)" != 'root' ]; then
-  echo "This script should be run as root"
+# Beginning
+# Make sure the user and group for lockss are defined
+Check_Set "${LOCKSS_UID}" LOCKSS_UID
+Check_Set "${LOCKSS_GID}" LOCKSS_GID
+
+if [ "$(id -u)" != "${LOCKSS_UID}" ]; then
+  echo "This script should be run as the LOCKSS user with ID ${LOCKSS_UID}"
   Exit 1
 fi
 
-# Setup the lockss user and group first
+# Sanity check for stdout/stderr logging
 
-Check_Set "${LOCKSS_GROUP}" LOCKSS_GROUP
-Check_Set "${LOCKSS_GID}" LOCKSS_GID
-Check_Set "${LOCKSS_USER}" LOCKSS_USER
-Check_Set "${LOCKSS_UID}" LOCKSS_UID
+Check_Set "${LOCKSS_LOGS}" LOCKSS_LOGS
+Check_Dir "${LOCKSS_LOGS}"
 
-addgroup --system \
-         --gid "${LOCKSS_GID}" \
-         "${LOCKSS_GROUP}" \
-&& adduser --system \
-           --disabled-password \
-           --gecos 'LOCKSS User' \
-           --uid "${LOCKSS_UID}" \
-           --ingroup "${LOCKSS_GROUP}" \
-           --shell "/bin/sh" \
-           "${LOCKSS_USER}"
+LOCKSS_LOGFILE="${LOCKSS_LOGS}/stdout.log"
 
-# Invoke lockss-entrypoint
+# Redirect stdout and stderr to file
 
-export OLDPATH="${PATH}"
-su "${LOCKSS_USER}" -p -c /usr/local/bin/lockss-entrypoint
+echo "$(date) Redirecting stdout and stderr to ${LOCKSS_LOGFILE}."
+exec >> $LOCKSS_LOGFILE
+exec 2>&1
+
+echo "$$" > "${STARTUP_FILE}"
+rm -f "${PID_FILE}"
+
+echo "$(date) *************** CONTAINER ENTRY POINT ***************"
+echo "$(date) Beginning execution..."
+echo "$(date) Maven coordinates: ${LABEL_MAVEN_GROUP}:${LABEL_MAVEN_ARTIFACT}:${LABEL_MAVEN_VERSION}"
+echo "$(date) Environment:"
+env | sort
+
+# Sanity checks
+
+echo "$(date) Sanity checks..."
+Check_Executable 'awk'
+Check_Executable 'curl'
+Check_Executable 'date'
+Check_Executable 'envsubst'
+Check_Executable 'java'
+Check_Executable 'nc'
+
+Check_Set "${CONFIGS}"
+Check_Dir_Read "${CONFIGS}"
+
+Check_Set "${LOCKSS_DATA}" LOCKSS_DATA
+Check_Dir "${LOCKSS_DATA}"
+Check_Set "${LOCKSS_PIDS}" LOCKSS_PIDS
+Check_Dir "${LOCKSS_PIDS}"
+
+Check_Set "${LOCKSS_HOME}" LOCKSS_HOME
+Check_Dir "${LOCKSS_HOME}"
+Check_Set "${LOCKSS_JAR}" LOCKSS_JAR
+Check_File "${LOCKSS_JAR}"
+
+Check_Set "${LOCKSS_TMP}" LOCKSS_TMP
+
+# Layer configuration
+
+echo "$(date) Layering configuration..."
+mkdir -p "${LOCKSS_HOME}/etc"
+Apply_Config "${LOCKSS_HOME}/etc.base"
+echo "$(date) Done layering configuration."
+
+# Relevant if LOCKSS_IS_REPO
+JVM_OPTS_REPO=''
+ARGS_REPO=''
+
+# Relevant for all services
+ARGS_BOOTSTRAP=''
+ARGS_CLUSTER=''
+ARGS_SERVICE=''
+ARGS_GROUP=''
+
+if [ "${LOCKSS_IS_REPO}" = 'true' ]; then
+
+  #
+  # LOCKSS_IS_REPO
+  #
+  echo "$(date) Repository service configuration..."
+  ARGS_REPO="--spring.config.location=file:${CONFIGS}/lockss.properties"
+
+fi
+
+  # (left indented for now to clarify diffs)
+
+  #
+  # All services
+  #
+
+  # Bootstrap configuration
+
+  echo "$(date) Bootstrap configuration..."
+  Check_File "${CONFIGS}/lockss_bootstrap"
+  ARGS_BOOTSTRAP="-b resource:application.properties -b ${LOCKSS_HOME}/etc/lockss_bootstrap_base -b ${CONFIGS}/lockss_bootstrap"
+
+  # Cluster configuration
+
+  echo "$(date) Cluster configuration..."
+  if [ "${LOCKSS_IS_CONFIG}" = 'true' ]; then
+    #
+    # LOCKSS_IS_CONFIG
+    #
+    Check_Set "${LOCKSS_PROPS_URL}" LOCKSS_PROPS_URL
+    Check_File "${CONFIGS}/lockss_cluster"
+    ARGS_CLUSTER="-l ${LOCKSS_PROPS_URL} -l ${CONFIGS}/lockss_cluster -l ${CONFIGS}/lockss_cluster_opt"
+  else
+    #
+    # !LOCKSS_IS_CONFIG
+    #
+    Check_Set "${LOCKSS_CONFIG_URL}" LOCKSS_CONFIG_URL
+    Check_Set "${LOCKSS_ADMIN_USER}" LOCKSS_ADMIN_USER
+    Check_Set "${SECRETS}"
+    Check_Dir_Read "${SECRETS}"
+    Check_File "${SECRETS}/lockss_ui_pass"
+#    LOCKSS_CONFIG_URL="${LOCKSS_CONFIG_URL%%://*}://$(Url_Encode "${LOCKSS_ADMIN_USER}"):$(Url_Encode "$(cat "${SECRETS}/lockss_ui_pass")")@${LOCKSS_CONFIG_URL#*://}"
+    ARGS_CLUSTER="-c ${LOCKSS_CONFIG_URL} -l ${LOCKSS_CONFIG_URL}/config/file/cluster"
+  fi
+
+  # Service configuration
+
+  echo "$(date) Service configuration..."
+  Check_File "${CONFIGS}/lockss_service"
+  Check_File "${SECRETS}/lockss-auth"
+  ARGS_SERVICE="-p ${LOCKSS_HOME}/etc/lockss_service_base -p ${CONFIGS}/lockss_service -p ${CONFIGS}/lockss_service_opt -r ${SECRETS}/lockss-auth"
+
+  # Group configuration
+  echo "$(date) Group configuration..."
+  if [ -n "${LOCKSS_PRESERVATION_GROUP}" ]; then
+    ARGS_GROUP="-g ${LOCKSS_PRESERVATION_GROUP}"
+  fi
+
+# Sequencing
+
+if [ -n "${LOCKSS_WAIT_FOR_PORT}" ]; then
+  Wait_For_Port "${LOCKSS_WAIT_FOR_PORT}"
+fi
+
+if [ -n "${LOCKSS_WAIT_FOR_200}" ]; then
+  Wait_For_200 "${LOCKSS_WAIT_FOR_200}"
+fi
+
+# Temp directory handling
+
+Temp_Dir_Cleanup
+
+# Log4j config
+
+export LOG4J_LOCKSS_CONFIG="${LOCKSS_HOME}/etc/log4j2-lockss-container.xml"
+
+# Launch service
+
+echo "$(date) Launching service..."
+
+cd "${LOCKSS_TMP}"
+echo "$(date) Working directory: $(pwd)"
+
+echo "$(date) Launch parameters:"
+java -version
+echo "JAVA_HOME=${JAVA_HOME}"
+echo "JVM_OPTS_DOCKER=${JVM_OPTS_DOCKER}"
+echo "JVM_OPTS_LOGGING=${JVM_OPTS_LOGGING}"
+echo "JVM_OPTS_TMP=${JVM_OPTS_TMP}"
+echo "JVM_OPTS_REPO=${JVM_OPTS_REPO}"
+echo "JVM_OPTS_ADDITIONAL=${JVM_OPTS_ADDITIONAL}"
+echo "ARGS_BOOTSTRAP=${ARGS_BOOTSTRAP}"
+echo "ARGS_CLUSTER=${ARGS_CLUSTER}"
+echo "ARGS_SERVICE=${ARGS_SERVICE}"
+echo "ARGS_GROUP=${ARGS_GROUP}"
+echo "ARGS_REPO=${ARGS_REPO}"
+echo "ARGS_ADDITIONAL=${ARGS_ADDITIONAL}"
+
+echo "$(date) *************** JVM INVOCATION ***************"
+echo "$$" > "${PID_FILE}"
+rm -f "${STARTUP_FILE}"
+exec java ${JVM_OPTS_DOCKER} \
+          ${JVM_OPTS_LOGGING} \
+          ${JVM_OPTS_TMP} \
+          ${JVM_OPTS_REPO} \
+          ${JVM_OPTS_ADDITIONAL} \
+          -jar "${LOCKSS_JAR}" \
+          ${ARGS_BOOTSTRAP} \
+          ${ARGS_CLUSTER} \
+          ${ARGS_SERVICE} \
+          ${ARGS_GROUP} \
+          ${ARGS_REPO} \
+          ${ARGS_ADDITIONAL}
