@@ -118,7 +118,7 @@ ENV LOCKSS_WAIT_FOR_PORT_TIMEOUT=5 \
     LOCKSS_WAIT_FOR_200_SLEEP=5 \
     CONFIGS=/run/configs \
     SECRETS=/run/secrets \
-    LOCKSS_HOME=/home/lockss \
+    LOCKSS_HOME=/usr/local/share/lockss \
     LOCKSS_PIDS=/var/run \
     LOCKSS_DATA=/data \
     LOCKSS_TMP=/tmp/lockss \
@@ -133,7 +133,9 @@ RUN ipm-update \
                 gettext \
                 jq \
                 netcat \
- && ipm-clean
+ && ipm-clean \
+ && mkdir -m 0755 "${LOCKSS_HOME}" \
+ && mkdir -m 0777 "${LOCKSS_HOME}/etc"
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 
