@@ -264,12 +264,13 @@ ARGS_SERVICE=''
 ARGS_GROUP=''
 
 if [ "${LOCKSS_IS_REPO}" = 'true' ]; then
+  Check_File "${SECRETS}/solr-auth"
 
   #
   # LOCKSS_IS_REPO
   #
   echo "$(date) Repository service configuration..."
-  ARGS_REPO="--spring.config.location=file:${CONFIGS}/lockss.properties"
+  ARGS_REPO="--spring.config.location=file:${CONFIGS}/lockss.properties -s solr:${SECRETS}/solr-auth"
 
 fi
 
@@ -313,8 +314,7 @@ fi
   echo "$(date) Service configuration..."
   Check_File "${CONFIGS}/lockss_service"
   Check_File "${SECRETS}/lockss-auth"
-  ARGS_SERVICE="-p ${LOCKSS_HOME}/etc/lockss_service_base -p ${CONFIGS}/lockss_service -p ${CONFIGS}/lockss_service_opt -r ${SECRETS}/lockss-auth"
-
+  ARGS_SERVICE="-p ${LOCKSS_HOME}/etc/lockss_service_base -p ${CONFIGS}/lockss_service -p ${CONFIGS}/lockss_service_opt -s rest:${SECRETS}/lockss-auth"
   # Group configuration
   echo "$(date) Group configuration..."
   if [ -n "${LOCKSS_PRESERVATION_GROUP}" ]; then
