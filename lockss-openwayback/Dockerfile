@@ -38,7 +38,8 @@ ENV LOCKSS_WAIT_FOR_PORT_TIMEOUT=3 \
     LOCKSS_WAIT_FOR_200_TIMEOUT=3 \
     LOCKSS_WAIT_FOR_200_SLEEP=10 \
     SECRETS=/run/secrets \
-    OPENWB_COLLECTION=lockss
+    OPENWB_COLLECTION=lockss \
+    LOCKSS_LOGS=/var/log/lockss
 
 # Inherit IPM from lockss-debian
 COPY --from=lockss-debian /usr/local/etc/ipm/* /usr/local/etc/ipm/
