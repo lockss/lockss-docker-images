@@ -253,15 +253,15 @@ mkdir -p "${LOCKSS_HOME}/etc"
 Apply_Config "${LOCKSS_HOME}/etc.base"
 echo "$(date) Done layering configuration."
 
-# Relevant if LOCKSS_IS_REPO
-JVM_OPTS_REPO=''
-ARGS_REPO=''
-
 # Relevant for all services
 ARGS_BOOTSTRAP=''
 ARGS_CLUSTER=''
 ARGS_SERVICE=''
 ARGS_GROUP=''
+
+# Service-specific
+JVM_OPTS_THIS_SERVICE=''
+ARGS_THIS_SERVICE=''
 
 if [ "${LOCKSS_IS_REPO}" = 'true' ]; then
   Check_File "${SECRETS}/solr-auth"
@@ -270,8 +270,17 @@ if [ "${LOCKSS_IS_REPO}" = 'true' ]; then
   # LOCKSS_IS_REPO
   #
   echo "$(date) Repository service configuration..."
-  ARGS_REPO="--spring.config.location=file:${CONFIGS}/lockss.properties -s solr:${SECRETS}/solr-auth"
+  ARGS_THIS_SERVICE="--spring.config.location=file:${CONFIGS}/lockss.properties -s solr:${SECRETS}/solr-auth"
 
+fi
+
+if [ "${LOCKSS_IS_POLLER}" = 'true' ]; then
+
+  #
+  # LOCKSS_IS_POLLER
+  #
+  echo "$(date) Poller service configuration..."
+  ARGS_THIS_SERVICE="-s lcapssl:${SECRETS}/lcap-ssl-pass"
 fi
 
   # (left indented for now to clarify diffs)
@@ -352,13 +361,13 @@ echo "JAVA_HOME=${JAVA_HOME}"
 echo "JVM_OPTS_DOCKER=${JVM_OPTS_DOCKER}"
 echo "JVM_OPTS_LOGGING=${JVM_OPTS_LOGGING}"
 echo "JVM_OPTS_TMP=${JVM_OPTS_TMP}"
-echo "JVM_OPTS_REPO=${JVM_OPTS_REPO}"
+echo "JVM_OPTS_THIS_SERVICE=${JVM_OPTS_THIS_SERVICE}"
 echo "JVM_OPTS_ADDITIONAL=${JVM_OPTS_ADDITIONAL}"
 echo "ARGS_BOOTSTRAP=${ARGS_BOOTSTRAP}"
 echo "ARGS_CLUSTER=${ARGS_CLUSTER}"
 echo "ARGS_SERVICE=${ARGS_SERVICE}"
 echo "ARGS_GROUP=${ARGS_GROUP}"
-echo "ARGS_REPO=${ARGS_REPO}"
+echo "ARGS_THIS_SERVICE=${ARGS_THIS_SERVICE}"
 echo "ARGS_ADDITIONAL=${ARGS_ADDITIONAL}"
 
 echo "$(date) *************** JVM INVOCATION ***************"
@@ -367,12 +376,12 @@ rm -f "${STARTUP_FILE}"
 exec java ${JVM_OPTS_DOCKER} \
           ${JVM_OPTS_LOGGING} \
           ${JVM_OPTS_TMP} \
-          ${JVM_OPTS_REPO} \
+          ${JVM_OPTS_THIS_SERVICE} \
           ${JVM_OPTS_ADDITIONAL} \
           -jar "${LOCKSS_JAR}" \
           ${ARGS_BOOTSTRAP} \
           ${ARGS_CLUSTER} \
           ${ARGS_SERVICE} \
           ${ARGS_GROUP} \
-          ${ARGS_REPO} \
+          ${ARGS_THIS_SERVICE} \
           ${ARGS_ADDITIONAL}
