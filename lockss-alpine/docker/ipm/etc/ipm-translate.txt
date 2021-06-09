@@ -32,6 +32,7 @@ sed	busybox
 tar	busybox
 tcpdump	tcpdump
 traceroute	busybox
+tzdata	tzdata
 vim	vim
 wget	wget
 which	busybox

@@ -32,6 +32,7 @@ sed	GNU stream editor
 tar	Utility used to store, backup, and transport files
 tcpdump	A tool for network monitoring and data acquisition
 traceroute	Traces the route taken by packets over an IPv4/IPv6 network
+tzdata	Timezone data
 vim	Improved vi-style text editor
 wget	A network utility to retrieve files from the Web
 which	A utility to show the full path of commands
