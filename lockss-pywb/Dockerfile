@@ -27,7 +27,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-debian:stretch-20190326-slim-1 AS lockss-debian
+FROM lockss/lockss-debian:9.8-slim-SNAPSHOT AS lockss-debian
 
 FROM webrecorder/pywb:2.4.2
 
@@ -52,11 +52,12 @@ COPY --from=lockss-debian /usr/local/etc/ipm/* /usr/local/etc/ipm/
 COPY --from=lockss-debian /usr/local/bin/* /usr/local/bin/
 RUN ipm-setup apt-transport-https
 
-# Install curl, envsubst and nc
+# Install curl, envsubst, nc and tzdata
 RUN ipm-update \
  && ipm-install curl \
                 gettext \
                 netcat \
+                tzdata \
  && ipm-clean
 
 COPY /docker/pywb/etc/config.yaml.tpl /usr/local/share/pywb/etc/
