@@ -52,16 +52,18 @@ COPY --from=lockss-debian /usr/local/etc/ipm/* /usr/local/etc/ipm/
 COPY --from=lockss-debian /usr/local/bin/* /usr/local/bin/
 RUN ipm-setup apt-transport-https
 
-# Install curl, envsubst, nc and tzdata
+# Install curl, envsubst, logrotate, nc and tzdata
 RUN ipm-update \
  && ipm-install curl \
                 gettext \
+                logrotate \
                 netcat \
                 tzdata \
  && ipm-clean
 
 COPY /docker/pywb/etc/config.yaml.tpl /usr/local/share/pywb/etc/
 COPY /docker/bin/* /usr/local/bin/
+COPY /docker/logrotate/* /etc/logrotate.d/
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 
