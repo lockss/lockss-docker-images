@@ -14,6 +14,7 @@ gzip	A popular data compression program
 jq	A lightweight and flexible command-line JSON processor
 less	File pager
 links	Web browser running in both graphics and text mode
+logrotate	Tool to rotate logfiles
 lynx	Cross-platform text-based browser
 mtr	Full screen ncurses traceroute tool
 nano	Enhanced clone of the Pico text editor
@@ -32,6 +33,7 @@ sed	GNU stream editor
 tar	Utility used to store, backup, and transport files
 tcpdump	A tool for network monitoring and data acquisition
 traceroute	Traces the route taken by packets over an IPv4/IPv6 network
+tzdata	Timezone data
 vim	Improved vi-style text editor
 wget	A network utility to retrieve files from the Web
 which	A utility to show the full path of commands

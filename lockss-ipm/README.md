@@ -16,7 +16,7 @@ Use `ipm-list` to learn about packages: `o` for originally installed, `i` for in
 
 ## How To Use
 
-See `lockss/lockss-alpine`, `lockss/lockss-centos` and `lockss/lockss-ubuntu` for IPM implementations for Alpine, CentOS and Ubuntu, respectively.
+See `lockss/lockss-alpine`, `lockss/lockss-centos`, `lockss-debian` and `lockss/lockss-ubuntu` for IPM implementations for Alpine, Debian, CentOS and Ubuntu, respectively.
 
 If you want to start from these base images, simply use them, for example:
 
@@ -78,3 +78,7 @@ Note that IPM depends on a POSIX shell and:
 
 *   `awk`
 *   `which` (not pre-installed in `centos:7.6.1810`)
+
+## Docker Hub
+
+See Docker Hub for available tags: <https://hub.docker.com/r/lockss/lockss-ipm>
