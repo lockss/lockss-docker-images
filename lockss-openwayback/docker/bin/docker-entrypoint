@@ -117,12 +117,25 @@ Wait_For_200()
   echo "$(date) Done waiting for HTTP 200 responses."
 }
 
+# Sanity check for stdout/stderr logging
+
+Check_Set "${LOCKSS_LOGS}" LOCKSS_LOGS
+Check_Dir "${LOCKSS_LOGS}"
+
+LOCKSS_LOGFILE="${LOCKSS_LOGS}/stdout.log"
+
+# Redirect stdout and stderr to file
+
+echo "$(date) Redirecting stdout and stderr to ${LOCKSS_LOGFILE}."
+exec >> $LOCKSS_LOGFILE
+exec 2>&1
+
 # Begin container execution
 
 echo "$(date) *************** CONTAINER ENTRY POINT ***************"
 echo "$(date) Beginning execution..."
 echo "$(date) Environment:"
-env
+env | sort
 
 # Sanity checks
 

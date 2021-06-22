@@ -1,4 +1,4 @@
-# Copyright (c) 2000-2019, Board of Trustees of Leland Stanford Jr. University
+# Copyright (c) 2000-2021, Board of Trustees of Leland Stanford Jr. University
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-debian:stretch-20190326-slim-1 AS lockss-debian
+FROM lockss/lockss-debian:9.8-slim AS lockss-debian
 
 FROM iipc/openwayback:openwayback-2.4.0
 
@@ -38,21 +38,25 @@ ENV LOCKSS_WAIT_FOR_PORT_TIMEOUT=3 \
     LOCKSS_WAIT_FOR_200_TIMEOUT=3 \
     LOCKSS_WAIT_FOR_200_SLEEP=10 \
     SECRETS=/run/secrets \
-    OPENWB_COLLECTION=lockss
+    OPENWB_COLLECTION=lockss \
+    LOCKSS_LOGS=/var/log/lockss
 
 # Inherit IPM from lockss-debian
 COPY --from=lockss-debian /usr/local/etc/ipm/* /usr/local/etc/ipm/
 COPY --from=lockss-debian /usr/local/bin/* /usr/local/bin/
 RUN ipm-setup apt-transport-https
 
-# Install curl, envsubst and nc
+# Install curl, envsubst, logrotate, nc and tzdata
 RUN ipm-update \
  && ipm-install curl \
                 gettext \
+                logrotate \
                 netcat \
+                tzdata \
  && ipm-clean
 
 COPY /docker/openwayback/* /usr/local/share/lockss-openwayback/
 COPY /docker/bin/* /usr/local/bin/
+COPY /docker/logrotate/* /etc/logrotate.d/
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
