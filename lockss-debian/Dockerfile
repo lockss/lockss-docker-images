@@ -1,4 +1,4 @@
-# Copyright (c) 2000-2019, Board of Trustees of Leland Stanford Jr. University
+# Copyright (c) 2000-2021, Board of Trustees of Leland Stanford Jr. University
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -27,9 +27,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-ipm:2.1 AS lockss-ipm
+FROM lockss/lockss-ipm:2.2 AS lockss-ipm
 
-FROM debian:stretch-20190326-slim
+FROM debian:9.8-slim
 
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
 
