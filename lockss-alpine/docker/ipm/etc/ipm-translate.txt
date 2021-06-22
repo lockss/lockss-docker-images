@@ -14,6 +14,7 @@ gzip	busybox
 jq	jq
 less	busybox
 links	links
+logrotate	logrotate
 lynx	lynx
 mtr	mtr
 nano	nano
@@ -32,6 +33,7 @@ sed	busybox
 tar	busybox
 tcpdump	tcpdump
 traceroute	busybox
+tzdata	tzdata
 vim	vim
 wget	wget
 which	busybox
