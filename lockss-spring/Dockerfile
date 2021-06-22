@@ -27,7 +27,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-alpine:3.13.5-SNAPSHOT as lockss-alpine
+FROM lockss/lockss-alpine:3.13.5 as lockss-alpine
 
 FROM adoptopenjdk/openjdk8:jdk8u292-b10-alpine
 
