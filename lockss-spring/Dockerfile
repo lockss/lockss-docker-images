@@ -1,4 +1,4 @@
-# Copyright (c) 2000-2020, Board of Trustees of Leland Stanford Jr. University
+# Copyright (c) 2000-2021, Board of Trustees of Leland Stanford Jr. University
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -27,9 +27,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-alpine:3.10.1-1 as lockss-alpine
+FROM lockss/lockss-alpine:3.13.5 as lockss-alpine
 
-FROM adoptopenjdk/openjdk8:jdk8u212-b04-alpine
+FROM adoptopenjdk/openjdk8:jdk8u292-b10-alpine
 
 COPY --from=lockss-alpine /usr/local/etc/ipm/* /usr/local/etc/ipm/
 COPY --from=lockss-alpine /usr/local/bin/* /usr/local/bin/
@@ -122,7 +122,9 @@ ENV LOCKSS_WAIT_FOR_PORT_TIMEOUT=5 \
     LOCKSS_PIDS=/var/run \
     LOCKSS_DATA=/data \
     LOCKSS_TMP=/tmp/lockss \
-    LOCKSS_LOGS=/var/log/lockss
+    LOCKSS_LOGS=/var/log/lockss \
+    LOCKSS_USER=lockss \
+    LOCKSS_GROUP=lockss
 
 WORKDIR /tmp
 
@@ -131,7 +133,10 @@ RUN ipm-update \
                 gettext \
                 jq \
                 netcat \
- && ipm-clean
+                tzdata \
+ && ipm-clean \
+ && mkdir -m 0755 "${LOCKSS_HOME}" \
+ && mkdir -m 0777 "${LOCKSS_HOME}/etc"
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 

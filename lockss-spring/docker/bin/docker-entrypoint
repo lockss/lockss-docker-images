@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (c) 2000-2019, Board of Trustees of Leland Stanford Jr. University
+# Copyright (c) 2000-2021, Board of Trustees of Leland Stanford Jr. University
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -36,8 +36,8 @@ JVM_OPTS_LOGGING='-Dorg.lockss.defaultLogLevel=debug -Djava.util.logging.manager
 JVM_OPTS_TMP="-Djava.io.tmpdir=${LOCKSS_TMP}"
 LOCKSS_TMP_TRASH="${LOCKSS_TMP}/../lockss-trash"
 LOCKSS_JAR="${LOCKSS_HOME}/lib/lockss.jar"
-STARTUP_FILE="${LOCKSS_PIDS}/lockss.startup"
-PID_FILE="${LOCKSS_PIDS}/lockss.pid"
+STARTUP_FILE="${LOCKSS_PIDS}/${_0}.startup"
+PID_FILE="${LOCKSS_PIDS}/${_0}.pid"
 
 # $1=exitcode
 Exit()
@@ -69,16 +69,32 @@ Apply_Config()
   fi
 }
 
+# Checks that $1 is -e, -d, -r and -w
 Check_Dir()
 {
-  if [ ! -d "${1}" ]; then
-    echo "${_0}: directory not found: ${1}"
-    Exit 1
-  fi
+  Check_Dir_Read "${1}"
   if [ ! -w "${1}" ]; then
     echo "${_0}: directory not writeable: ${1}"
     Exit 1
   fi
+}
+
+# Checks that $1 is -e, -d and -r
+Check_Dir_Read()
+{
+  if [ ! -e "${1}" ]; then
+    echo "${_0}: directory not found: ${1}"
+    Exit 1
+  fi
+  if [ ! -d "${1}" ]; then
+    echo "${_0}: not a directory: ${1}"
+    Exit 1
+  fi
+  if [ ! -r "${1}" ]; then
+    echo "${_0}: directory not readable: ${1}"
+    Exit 1
+  fi
+
 }
 
 Check_Executable()
@@ -91,8 +107,12 @@ Check_Executable()
 
 Check_File()
 {
-  if [ ! -f "${1}" ]; then
+  if [ ! -e "${1}" ]; then
     echo "${_0}: file not found: ${1}"
+    Exit 1
+  fi
+  if [ ! -f "${1}" ]; then
+    echo "${_0}: not a file: ${1}"
     Exit 1
   fi
   if [ ! -r "${1}" ]; then
@@ -169,20 +189,31 @@ Wait_For_200()
 }
 
 # Beginning
+# Make sure the user and group for lockss are defined
+Check_Set "${LOCKSS_UID}" LOCKSS_UID
+Check_Set "${LOCKSS_GID}" LOCKSS_GID
+
+if [ "$(id -u)" != "${LOCKSS_UID}" ]; then
+  echo "This script should be run as the LOCKSS user with ID ${LOCKSS_UID}"
+  Exit 1
+fi
 
 # Sanity check for stdout/stderr logging
+
 Check_Set "${LOCKSS_LOGS}" LOCKSS_LOGS
 Check_Dir "${LOCKSS_LOGS}"
 
 LOCKSS_LOGFILE="${LOCKSS_LOGS}/stdout.log"
 
-# redirect stdout and stderr to file
+# Redirect stdout and stderr to file
+
 echo "$(date) Redirecting stdout and stderr to ${LOCKSS_LOGFILE}."
 exec >> $LOCKSS_LOGFILE
 exec 2>&1
 
 echo "$$" > "${STARTUP_FILE}"
 rm -f "${PID_FILE}"
+
 echo "$(date) *************** CONTAINER ENTRY POINT ***************"
 echo "$(date) Beginning execution..."
 echo "$(date) Maven coordinates: ${LABEL_MAVEN_GROUP}:${LABEL_MAVEN_ARTIFACT}:${LABEL_MAVEN_VERSION}"
@@ -192,7 +223,6 @@ env | sort
 # Sanity checks
 
 echo "$(date) Sanity checks..."
-
 Check_Executable 'awk'
 Check_Executable 'curl'
 Check_Executable 'date'
@@ -201,15 +231,16 @@ Check_Executable 'java'
 Check_Executable 'nc'
 
 Check_Set "${CONFIGS}"
-Check_Dir "${CONFIGS}"
+Check_Dir_Read "${CONFIGS}"
 
 Check_Set "${LOCKSS_DATA}" LOCKSS_DATA
 Check_Dir "${LOCKSS_DATA}"
 Check_Set "${LOCKSS_PIDS}" LOCKSS_PIDS
-Check_Dir "${LOCKSS_PIDS}"
+Check_Dir_Read "${LOCKSS_PIDS}"
 
 Check_Set "${LOCKSS_HOME}" LOCKSS_HOME
-Check_Dir "${LOCKSS_HOME}"
+Check_Dir_Read "${LOCKSS_HOME}"
+Check_Dir "${LOCKSS_HOME}/etc"
 Check_Set "${LOCKSS_JAR}" LOCKSS_JAR
 Check_File "${LOCKSS_JAR}"
 
@@ -222,24 +253,34 @@ mkdir -p "${LOCKSS_HOME}/etc"
 Apply_Config "${LOCKSS_HOME}/etc.base"
 echo "$(date) Done layering configuration."
 
-# Relevant if LOCKSS_IS_REPO
-JVM_OPTS_REPO=''
-ARGS_REPO=''
-
 # Relevant for all services
 ARGS_BOOTSTRAP=''
 ARGS_CLUSTER=''
 ARGS_SERVICE=''
 ARGS_GROUP=''
 
+# Service-specific
+JVM_OPTS_THIS_SERVICE=''
+ARGS_THIS_SERVICE=''
+
 if [ "${LOCKSS_IS_REPO}" = 'true' ]; then
+  Check_File "${SECRETS}/solr-auth"
 
   #
   # LOCKSS_IS_REPO
   #
   echo "$(date) Repository service configuration..."
-  ARGS_REPO="--spring.config.location=file:${CONFIGS}/lockss.properties"
+  ARGS_THIS_SERVICE="--spring.config.location=file:${CONFIGS}/lockss.properties -s solr:${SECRETS}/solr-auth"
 
+fi
+
+if [ "${LOCKSS_IS_POLLER}" = 'true' ]; then
+
+  #
+  # LOCKSS_IS_POLLER
+  #
+  echo "$(date) Poller service configuration..."
+  ARGS_THIS_SERVICE="-s lcapssl:${SECRETS}/lcap-ssl-pass"
 fi
 
   # (left indented for now to clarify diffs)
@@ -271,7 +312,7 @@ fi
     Check_Set "${LOCKSS_CONFIG_URL}" LOCKSS_CONFIG_URL
     Check_Set "${LOCKSS_ADMIN_USER}" LOCKSS_ADMIN_USER
     Check_Set "${SECRETS}"
-    Check_Dir "${SECRETS}"
+    Check_Dir_Read "${SECRETS}"
     Check_File "${SECRETS}/lockss_ui_pass"
 #    LOCKSS_CONFIG_URL="${LOCKSS_CONFIG_URL%%://*}://$(Url_Encode "${LOCKSS_ADMIN_USER}"):$(Url_Encode "$(cat "${SECRETS}/lockss_ui_pass")")@${LOCKSS_CONFIG_URL#*://}"
     ARGS_CLUSTER="-c ${LOCKSS_CONFIG_URL} -l ${LOCKSS_CONFIG_URL}/config/file/cluster"
@@ -282,8 +323,7 @@ fi
   echo "$(date) Service configuration..."
   Check_File "${CONFIGS}/lockss_service"
   Check_File "${SECRETS}/lockss-auth"
-  ARGS_SERVICE="-p ${LOCKSS_HOME}/etc/lockss_service_base -p ${CONFIGS}/lockss_service -p ${CONFIGS}/lockss_service_opt -r ${SECRETS}/lockss-auth"
-
+  ARGS_SERVICE="-p ${LOCKSS_HOME}/etc/lockss_service_base -p ${CONFIGS}/lockss_service -p ${CONFIGS}/lockss_service_opt -s rest:${SECRETS}/lockss-auth"
   # Group configuration
   echo "$(date) Group configuration..."
   if [ -n "${LOCKSS_PRESERVATION_GROUP}" ]; then
@@ -321,13 +361,13 @@ echo "JAVA_HOME=${JAVA_HOME}"
 echo "JVM_OPTS_DOCKER=${JVM_OPTS_DOCKER}"
 echo "JVM_OPTS_LOGGING=${JVM_OPTS_LOGGING}"
 echo "JVM_OPTS_TMP=${JVM_OPTS_TMP}"
-echo "JVM_OPTS_REPO=${JVM_OPTS_REPO}"
+echo "JVM_OPTS_THIS_SERVICE=${JVM_OPTS_THIS_SERVICE}"
 echo "JVM_OPTS_ADDITIONAL=${JVM_OPTS_ADDITIONAL}"
 echo "ARGS_BOOTSTRAP=${ARGS_BOOTSTRAP}"
 echo "ARGS_CLUSTER=${ARGS_CLUSTER}"
 echo "ARGS_SERVICE=${ARGS_SERVICE}"
 echo "ARGS_GROUP=${ARGS_GROUP}"
-echo "ARGS_REPO=${ARGS_REPO}"
+echo "ARGS_THIS_SERVICE=${ARGS_THIS_SERVICE}"
 echo "ARGS_ADDITIONAL=${ARGS_ADDITIONAL}"
 
 echo "$(date) *************** JVM INVOCATION ***************"
@@ -336,12 +376,12 @@ rm -f "${STARTUP_FILE}"
 exec java ${JVM_OPTS_DOCKER} \
           ${JVM_OPTS_LOGGING} \
           ${JVM_OPTS_TMP} \
-          ${JVM_OPTS_REPO} \
+          ${JVM_OPTS_THIS_SERVICE} \
           ${JVM_OPTS_ADDITIONAL} \
           -jar "${LOCKSS_JAR}" \
           ${ARGS_BOOTSTRAP} \
           ${ARGS_CLUSTER} \
           ${ARGS_SERVICE} \
           ${ARGS_GROUP} \
-          ${ARGS_REPO} \
+          ${ARGS_THIS_SERVICE} \
           ${ARGS_ADDITIONAL}

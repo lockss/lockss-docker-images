@@ -1,6 +1,6 @@
 # LOCKSS Spring Base Image
 
-This Dockerfile defines a base Docker image based on Alpine Linux 3.9, that encapsulates a LOCKSS service JAR built on the Spring Framework.
+This Dockerfile defines a base Docker image based on AdoptOpenJDK's Alpine Linux variant, that encapsulates a LOCKSS service JAR built on the Spring Framework.
 
 ## Docker Build Arguments
 
