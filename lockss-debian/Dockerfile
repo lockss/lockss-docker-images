@@ -27,7 +27,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-ipm:2.2-SNAPSHOT AS lockss-ipm
+FROM lockss/lockss-ipm:2.2 AS lockss-ipm
 
 FROM debian:9.8-slim
 
