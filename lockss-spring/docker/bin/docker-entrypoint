@@ -195,7 +195,7 @@ Add_Timestamp() {
 }
 
 # $1=log filename
-# redirect stdour/err to log file with timestamps
+# redirect stdout/err to log file with timestamps
 Redir_Std() {
   local file="$1"
   # Create named pipe, delete on exit
