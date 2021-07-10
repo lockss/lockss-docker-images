@@ -191,7 +191,7 @@ Wait_For_200()
 Add_Timestamp() {
   # 09 Jul 21 20:38:26 PDT
   local fmt="%d %b %y %T %Z "
-  gawk -F"\n" "{print strftime(\"${fmt}\", systime()) \$0; fflush()}"
+  awk -F"\n" "{print strftime(\"${fmt}\", systime()) \$0; fflush()}"
 }
 
 # $1=log filename
