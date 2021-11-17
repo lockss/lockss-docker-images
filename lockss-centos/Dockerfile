@@ -27,9 +27,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-ipm:2.1 as lockss-ipm
+FROM lockss/lockss-ipm:2.3.0-SNAPSHOT as lockss-ipm
 
-FROM centos:7.6.1810
+FROM centos:7.9.2009
 
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
 

@@ -27,7 +27,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-alpine:3.14.0-SNAPSHOT as lockss-alpine
+FROM lockss/lockss-alpine:3.14.3-SNAPSHOT as lockss-alpine
 
 FROM adoptopenjdk/openjdk8:jdk8u292-b10-alpine
 
@@ -132,6 +132,7 @@ RUN ipm-update \
  && ipm-install curl \
                 gettext \
                 jq \
+                logrotate \
                 netcat \
                 tzdata \
  && ipm-clean \
@@ -144,5 +145,6 @@ ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 
 COPY /docker/bin/* /usr/local/bin/
 COPY /docker/lockss/etc.base/* "${LOCKSS_HOME}/etc.base/"
+COPY /docker/logrotate/* /etc/logrotate.d/
 ONBUILD COPY /docker/lockss/etc.base/* "${LOCKSS_HOME}/etc.base/"
 ONBUILD COPY /target/current-with-deps.jar "${LOCKSS_HOME}/lib/lockss.jar"

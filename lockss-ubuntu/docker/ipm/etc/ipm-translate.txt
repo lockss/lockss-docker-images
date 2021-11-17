@@ -2,6 +2,7 @@ awk	mawk
 bash	bash
 bzip2	bzip2
 coreutils	coreutils
+cron	cron
 curl	curl
 dnsutils	dnsutils
 emacs	emacs-nox
@@ -14,6 +15,7 @@ gzip	gzip
 jq	jq
 less	less
 links	links
+logrotate	logrotate
 lynx	lynx
 mtr	mtr
 nano	nano
@@ -32,6 +34,7 @@ sed	sed
 tar	tar
 tcpdump	tcpdump
 traceroute	traceroute
+tzdata	tzdata
 vim	vim
 wget	wget
 which	debianutils

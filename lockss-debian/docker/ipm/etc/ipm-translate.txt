@@ -2,6 +2,7 @@ awk	mawk
 bash	bash
 bzip2	bzip2
 coreutils	coreutils
+cron	cron
 curl	curl
 dnsutils	dnsutils
 emacs	emacs-nox

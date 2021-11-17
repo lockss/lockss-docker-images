@@ -2,6 +2,7 @@ awk	busybox
 bash	bash
 bzip2	busybox
 coreutils	busybox
+cron	busybox
 curl	curl
 dnsutils	bind-tools
 emacs	emacs-nox
