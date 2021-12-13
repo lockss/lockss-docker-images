@@ -27,7 +27,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-debian:9.8-slim AS lockss-debian
+FROM lockss/lockss-debian:9.13-slim AS lockss-debian
 
 FROM webrecorder/pywb:2.4.2
 
@@ -56,14 +56,12 @@ RUN ipm-setup apt-transport-https
 RUN ipm-update \
  && ipm-install curl \
                 gettext \
-                logrotate \
                 netcat \
                 tzdata \
  && ipm-clean
 
 COPY /docker/pywb/etc/config.yaml.tpl /usr/local/share/pywb/etc/
 COPY /docker/bin/* /usr/local/bin/
-COPY /docker/logrotate/* /etc/logrotate.d/
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 
