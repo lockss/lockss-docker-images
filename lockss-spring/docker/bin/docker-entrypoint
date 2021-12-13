@@ -48,7 +48,7 @@ Exit()
 
 Apply_Config()
 {
-  echo "$(date) Applying config from ${1}..."
+  echo "Applying config from ${1}..."
   if [ -d "${1}" ]; then
     : \
     && TMP=$(mktemp -d) \
@@ -61,10 +61,10 @@ Apply_Config()
     && ( cd "${TMP}" && tar cf - --exclude '*.tpl' . ) | tar xf -
     RET=$?
     rm -rf "${TMP}"
-    echo "$(date) Done applying config from ${1}."
+    echo "Done applying config from ${1}."
     return $RET
   else
-    echo "$(date) No config directory ${1}."
+    echo "No config directory ${1}."
     return 0
   fi
 }
@@ -131,7 +131,7 @@ Check_Set()
 
 Temp_Dir_Cleanup()
 {
-  echo "$(date) Temporary directory cleanup..."
+  echo "Temporary directory cleanup..."
   mkdir -p "${LOCKSS_TMP_TRASH}"
   TRASH="$(mktemp -d -p "${LOCKSS_TMP_TRASH}")"
   mv "${LOCKSS_TMP}" "${TRASH}"
@@ -160,32 +160,58 @@ Url_Encode()
 # $1=space separated string of host:port pairs
 Wait_For_Port()
 {
-  echo "$(date) Starting wait for port on: $@"
+  echo "Starting wait for port on: $@"
   for hostport in $@ ; do
-    echo "$(date) Waiting for port on ${hostport}..."
+    echo "Waiting for port on ${hostport}..."
     host="${hostport%%:*}"
     port="${hostport#*:}"
     until nc -z -w "${LOCKSS_WAIT_FOR_PORT_TIMEOUT}" "${host}" "${port}" ; do
       sleep "${LOCKSS_WAIT_FOR_PORT_SLEEP}"
     done
-    echo "$(date) Done waiting for port on ${hostport}."
+    echo "Done waiting for port on ${hostport}."
   done
-  echo "$(date) Done waiting for ports."
+  echo "Done waiting for ports."
 }
 
 # $1=space separated string of host:port pairs
 Wait_For_200()
 {
-  echo "$(date) Starting wait for HTTP 200 responses from: $@"
+  echo "Starting wait for HTTP 200 responses from: $@"
   for hostport in $@ ; do
     url="http://${hostport}/status"
-    echo "$(date) Waiting for HTTP 200 response from ${url}..."
+    echo "Waiting for HTTP 200 response from ${url}..."
     until curl --silent --max-time "${LOCKSS_WAIT_FOR_200_TIMEOUT}" --location "${url}" ; do
       sleep "${LOCKSS_WAIT_FOR_200_SLEEP}"
     done
-    echo "$(date) Done waiting for HTTP 200 response from ${url}."
+    echo "Done waiting for HTTP 200 response from ${url}."
   done
-  echo "$(date) Done waiting for HTTP 200 responses."
+  echo "Done waiting for HTTP 200 responses."
+}
+
+Add_Timestamp() {
+  # 09 Jul 21 20:38:26 PDT
+  local fmt="%d %b %y %T %Z "
+  awk -F"\n" "{print strftime(\"${fmt}\", systime()) \$0; fflush()}"
+}
+
+# $1=log filename
+# redirect stdout/err to log file with timestamps
+Redir_Std() {
+  local file="$1"
+  # Create named pipe, delete on exit
+  local npipe=/tmp/$$.ptmp
+  trap "rm -f $npipe" EXIT
+  # This script always runs as process 1, don't rely on unique name
+  rm -f $npipe
+  mknod $npipe p
+  # Run timestamper in background, reading from pipe, appending to output file
+  Add_Timestamp <$npipe >>"${file}" &
+  # Close FD 1&2
+  exec 1>&-
+  exec 2>&-
+  # Redirect FD 1&2 to pipe
+  exec 1>$npipe
+  exec 2>&1
 }
 
 # Beginning
@@ -208,21 +234,20 @@ LOCKSS_LOGFILE="${LOCKSS_LOGS}/stdout.log"
 # Redirect stdout and stderr to file
 
 echo "$(date) Redirecting stdout and stderr to ${LOCKSS_LOGFILE}."
-exec >> $LOCKSS_LOGFILE
-exec 2>&1
+Redir_Std "${LOCKSS_LOGFILE}"
 
 echo "$$" > "${STARTUP_FILE}"
 rm -f "${PID_FILE}"
 
-echo "$(date) *************** CONTAINER ENTRY POINT ***************"
-echo "$(date) Beginning execution..."
-echo "$(date) Maven coordinates: ${LABEL_MAVEN_GROUP}:${LABEL_MAVEN_ARTIFACT}:${LABEL_MAVEN_VERSION}"
-echo "$(date) Environment:"
+echo "*************** CONTAINER ENTRY POINT ***************"
+echo "Beginning execution..."
+echo "Maven coordinates: ${LABEL_MAVEN_GROUP}:${LABEL_MAVEN_ARTIFACT}:${LABEL_MAVEN_VERSION}"
+echo "Environment:"
 env | sort
 
 # Sanity checks
 
-echo "$(date) Sanity checks..."
+echo "Sanity checks..."
 Check_Executable 'awk'
 Check_Executable 'curl'
 Check_Executable 'date'
@@ -248,10 +273,10 @@ Check_Set "${LOCKSS_TMP}" LOCKSS_TMP
 
 # Layer configuration
 
-echo "$(date) Layering configuration..."
+echo "Layering configuration..."
 mkdir -p "${LOCKSS_HOME}/etc"
 Apply_Config "${LOCKSS_HOME}/etc.base"
-echo "$(date) Done layering configuration."
+echo "Done layering configuration."
 
 # Relevant for all services
 ARGS_BOOTSTRAP=''
@@ -269,7 +294,7 @@ if [ "${LOCKSS_IS_REPO}" = 'true' ]; then
   #
   # LOCKSS_IS_REPO
   #
-  echo "$(date) Repository service configuration..."
+  echo "Repository service configuration..."
   ARGS_THIS_SERVICE="--spring.config.location=file:${CONFIGS}/lockss.properties -s solr:${SECRETS}/solr-auth"
 
 fi
@@ -279,7 +304,7 @@ if [ "${LOCKSS_IS_POLLER}" = 'true' ]; then
   #
   # LOCKSS_IS_POLLER
   #
-  echo "$(date) Poller service configuration..."
+  echo "Poller service configuration..."
   ARGS_THIS_SERVICE="-s lcapssl:${SECRETS}/lcap-ssl-pass"
 fi
 
@@ -291,13 +316,13 @@ fi
 
   # Bootstrap configuration
 
-  echo "$(date) Bootstrap configuration..."
+  echo "Bootstrap configuration..."
   Check_File "${CONFIGS}/lockss_bootstrap"
   ARGS_BOOTSTRAP="-b resource:application.properties -b ${LOCKSS_HOME}/etc/lockss_bootstrap_base -b ${CONFIGS}/lockss_bootstrap"
 
   # Cluster configuration
 
-  echo "$(date) Cluster configuration..."
+  echo "Cluster configuration..."
   if [ "${LOCKSS_IS_CONFIG}" = 'true' ]; then
     #
     # LOCKSS_IS_CONFIG
@@ -320,12 +345,12 @@ fi
 
   # Service configuration
 
-  echo "$(date) Service configuration..."
+  echo "Service configuration..."
   Check_File "${CONFIGS}/lockss_service"
   Check_File "${SECRETS}/lockss-auth"
   ARGS_SERVICE="-p ${LOCKSS_HOME}/etc/lockss_service_base -p ${CONFIGS}/lockss_service -p ${CONFIGS}/lockss_service_opt -s rest:${SECRETS}/lockss-auth"
   # Group configuration
-  echo "$(date) Group configuration..."
+  echo "Group configuration..."
   if [ -n "${LOCKSS_PRESERVATION_GROUP}" ]; then
     ARGS_GROUP="-g ${LOCKSS_PRESERVATION_GROUP}"
   fi
@@ -350,12 +375,12 @@ export LOG4J_LOCKSS_CONFIG="${LOCKSS_HOME}/etc/log4j2-lockss-container.xml"
 
 # Launch service
 
-echo "$(date) Launching service..."
+echo "Launching service..."
 
 cd "${LOCKSS_TMP}"
-echo "$(date) Working directory: $(pwd)"
+echo "Working directory: $(pwd)"
 
-echo "$(date) Launch parameters:"
+echo "Launch parameters:"
 java -version
 echo "JAVA_HOME=${JAVA_HOME}"
 echo "JVM_OPTS_DOCKER=${JVM_OPTS_DOCKER}"
@@ -370,7 +395,7 @@ echo "ARGS_GROUP=${ARGS_GROUP}"
 echo "ARGS_THIS_SERVICE=${ARGS_THIS_SERVICE}"
 echo "ARGS_ADDITIONAL=${ARGS_ADDITIONAL}"
 
-echo "$(date) *************** JVM INVOCATION ***************"
+echo "*************** JVM INVOCATION ***************"
 echo "$$" > "${PID_FILE}"
 rm -f "${STARTUP_FILE}"
 exec java ${JVM_OPTS_DOCKER} \
