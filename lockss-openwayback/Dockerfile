@@ -27,7 +27,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-debian:9.8-slim AS lockss-debian
+FROM lockss/lockss-debian:9.13-slim AS lockss-debian
 
 FROM iipc/openwayback:openwayback-2.4.0
 
@@ -50,13 +50,11 @@ RUN ipm-setup apt-transport-https
 RUN ipm-update \
  && ipm-install curl \
                 gettext \
-                logrotate \
                 netcat \
                 tzdata \
  && ipm-clean
 
 COPY /docker/openwayback/* /usr/local/share/lockss-openwayback/
 COPY /docker/bin/* /usr/local/bin/
-COPY /docker/logrotate/* /etc/logrotate.d/
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
