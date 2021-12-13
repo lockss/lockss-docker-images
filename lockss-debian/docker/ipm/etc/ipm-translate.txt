@@ -14,7 +14,6 @@ gzip	gzip
 jq	jq
 less	less
 links	links
-logrotate	logrotate
 lynx	lynx
 mtr	mtr
 nano	nano
