@@ -27,9 +27,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-ipm:2.2 as lockss-ipm
+FROM lockss/lockss-ipm:2.3.0 as lockss-ipm
 
-FROM alpine:3.13.5
+FROM alpine:3.15.0
 
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
 
