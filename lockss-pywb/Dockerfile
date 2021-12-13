@@ -56,14 +56,12 @@ RUN ipm-setup apt-transport-https
 RUN ipm-update \
  && ipm-install curl \
                 gettext \
-                logrotate \
                 netcat \
                 tzdata \
  && ipm-clean
 
 COPY /docker/pywb/etc/config.yaml.tpl /usr/local/share/pywb/etc/
 COPY /docker/bin/* /usr/local/bin/
-COPY /docker/logrotate/* /etc/logrotate.d/
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 
