@@ -2,7 +2,6 @@ awk	gawk
 bash	bash
 bzip2	bzip2
 coreutils	coreutils
-cron	cronie
 curl	curl
 dnsutils	dnsutils
 emacs	emacs-nox
@@ -15,7 +14,6 @@ gzip	gzip
 jq	jq
 less	less
 links	elinks
-logrotate	logrotate
 lynx	lynx
 mtr	mtr
 nano	nano

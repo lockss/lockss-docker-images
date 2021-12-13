@@ -2,7 +2,6 @@ awk	The Awk pattern matching language
 bash	The GNU Bourne Again shell
 bzip2	A high-quality data compression program
 coreutils	GNU core utilities (https://en.wikipedia.org/wiki/List_of_GNU_Core_Utilities_commands)
-cron	Cron daemon for executing programs at set times
 curl	URL retrieval utility and library
 dnsutils	DNS utilities (host, nslookup, dig, delv...)
 emacs	The extensible, customizable, self-documenting real-time display editor
@@ -15,7 +14,6 @@ gzip	A popular data compression program
 jq	A lightweight and flexible command-line JSON processor
 less	File pager
 links	Web browser running in both graphics and text mode
-logrotate	Tool to rotate logfiles
 lynx	Cross-platform text-based browser
 mtr	Full screen ncurses traceroute tool
 nano	Enhanced clone of the Pico text editor
