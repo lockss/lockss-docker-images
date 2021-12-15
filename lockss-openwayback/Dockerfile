@@ -29,7 +29,7 @@
 
 FROM lockss/lockss-debian:9.13-slim-2-SNAPSHOT AS lockss-debian
 
-FROM lockss/lockss-files-log4j:2.16.0-SNAPSHOT AS lockss-files-log4j
+FROM lockss/lockss-files-log4j:2.16.0-2-SNAPSHOT AS lockss-files-log4j
 
 FROM iipc/openwayback:openwayback-2.4.0
 
