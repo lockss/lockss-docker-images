@@ -29,6 +29,8 @@
 
 FROM lockss/lockss-debian:9.13-slim AS lockss-debian
 
+FROM lockss/lockss-files-log4j:2.16.0 AS lockss-files-log4j
+
 FROM iipc/openwayback:openwayback-2.4.0
 
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
@@ -46,15 +48,19 @@ COPY --from=lockss-debian /usr/local/etc/ipm/* /usr/local/etc/ipm/
 COPY --from=lockss-debian /usr/local/bin/* /usr/local/bin/
 RUN ipm-setup apt-transport-https
 
-# Install curl, envsubst, logrotate, nc and tzdata
+# Log4j mitigation
+RUN rm /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/log4j*.jar
+COPY --from=lockss-files-log4j /lockss-files-log4j/log4j*.jar /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/
+
+COPY /docker/openwayback/* /usr/local/share/lockss-openwayback/
+COPY /docker/bin/* /usr/local/bin/
+
+# Install curl, envsubst, nc and tzdata
 RUN ipm-update \
  && ipm-install curl \
                 gettext \
                 netcat \
                 tzdata \
  && ipm-clean
-
-COPY /docker/openwayback/* /usr/local/share/lockss-openwayback/
-COPY /docker/bin/* /usr/local/bin/
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
