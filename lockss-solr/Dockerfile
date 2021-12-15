@@ -27,31 +27,36 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-alpine:3.15.0 AS lockss-alpine
+FROM lockss/lockss-debian11:11.1-slim AS lockss-debian11
 
-FROM lockss/lockss-files-log4j:2.16.0 AS lockss-files-log4j
+FROM lockss/lockss-files-log4j:2.16.0-2 AS lockss-files-log4j
 
-FROM solr:7.2.1-alpine
+FROM solr:8.9.0-slim
 
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
 
-# Inherit IPM from lockss-alpine
-COPY --from=lockss-alpine /usr/local/etc/ipm/* /usr/local/etc/ipm/
-COPY --from=lockss-alpine /usr/local/bin/* /usr/local/bin/
 USER root
-RUN ipm-setup
+
+# Inherit IPM from lockss-debian11
+COPY --from=lockss-debian11 /usr/local/etc/ipm/* /usr/local/etc/ipm/
+COPY --from=lockss-debian11 /usr/local/bin/* /usr/local/bin/
+RUN ipm-setup apt-transport-https
 
 # Install curl and tzdata
 RUN ipm-update \
  && ipm-install curl \
                 tzdata \
  && ipm-clean
-USER solr
 
 # Log4j mitigation
-RUN rm /opt/solr/server/lib/ext/log4j*.jar
-COPY --from=lockss-files-log4j /lockss-files-log4j/log4j*.jar /opt/solr/server/lib/ext/
+RUN rm /opt/solr-8.9.0/contrib/prometheus-exporter/lib/log4j*.jar
+COPY --from=lockss-files-log4j /lockss-files-log4j/log4j-api-*.jar \
+                               /lockss-files-log4j/log4j-core-*.jar \
+                               /lockss-files-log4j/log4j-slf4j-impl-*.jar \
+                               /opt/solr-8.9.0/contrib/prometheus-exporter/lib/
+RUN rm /opt/solr-8.9.0/server/lib/ext/log4j*.jar
+COPY --from=lockss-files-log4j /lockss-files-log4j/log4j*.jar /opt/solr-8.9.0/server/lib/ext/
 
 COPY /docker/bin/* /usr/local/bin/
 
- 
+USER solr
