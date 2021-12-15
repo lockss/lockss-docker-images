@@ -31,7 +31,7 @@
 
 ROOT_DIR="$(realpath "$(dirname "${0}")/..")"
 TAG_FILE="${ROOT_DIR}/VERSION"
-TAG="lockss/lockss-debian:$(cat "${TAG_FILE}")"
+TAG="lockss/lockss-debian11:$(cat "${TAG_FILE}")"
 
 PUSH=''
 if [ "${1}" == '--push' ]; then
