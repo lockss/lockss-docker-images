@@ -27,9 +27,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-debian11:11.1-slim-SNAPSHOT AS lockss-debian11
+FROM lockss/lockss-debian11:11.1-slim AS lockss-debian11
 
-FROM lockss/lockss-files-log4j:2.16.0-2-SNAPSHOT AS lockss-files-log4j
+FROM lockss/lockss-files-log4j:2.16.0-2 AS lockss-files-log4j
 
 FROM solr:8.9.0-slim
 
