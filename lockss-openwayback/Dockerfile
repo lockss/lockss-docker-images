@@ -1,4 +1,4 @@
-# Copyright (c) 2000-2021, Board of Trustees of Leland Stanford Jr. University
+# Copyright (c) 2000-2022, Board of Trustees of Leland Stanford Jr. University
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,7 @@
 
 FROM lockss/lockss-debian:9.13-slim AS lockss-debian
 
-FROM lockss/lockss-files-log4j:2.16.0 AS lockss-files-log4j
+FROM lockss/lockss-files-log4j:2.17.1-1 AS lockss-files-log4j
 
 FROM iipc/openwayback:openwayback-2.4.0
 
@@ -50,7 +50,10 @@ RUN ipm-setup apt-transport-https
 
 # Log4j mitigation
 RUN rm /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/log4j*.jar
-COPY --from=lockss-files-log4j /lockss-files-log4j/log4j*.jar /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/
+COPY --from=lockss-files-log4j /lockss-files-log4j/log4j-api-*.jar \
+                               /lockss-files-log4j/log4j-core-*.jar \
+                               /lockss-files-log4j/log4j-1.2-api-*.jar \
+                               /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/
 
 COPY /docker/openwayback/* /usr/local/share/lockss-openwayback/
 COPY /docker/bin/* /usr/local/bin/
