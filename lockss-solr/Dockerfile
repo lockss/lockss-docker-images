@@ -1,4 +1,4 @@
-# Copyright (c) 2000-2021, Board of Trustees of Leland Stanford Jr. University
+# Copyright (c) 2000-2022, Board of Trustees of Leland Stanford Jr. University
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -27,9 +27,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-debian11:11.1-slim-SNAPSHOT AS lockss-debian11
+FROM lockss/lockss-debian11:11.1-slim AS lockss-debian11
 
-FROM lockss/lockss-files-log4j:2.17.1-1-SNAPSHOT AS lockss-files-log4j
+FROM lockss/lockss-files-log4j:2.17.1-1 AS lockss-files-log4j
 
 FROM solr:8.9.0-slim
 
