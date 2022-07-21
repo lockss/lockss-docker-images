@@ -32,7 +32,7 @@
 _0="$(basename "${0}")"
 _D0=$(dirname "${0}")
 
-. "${_D0}/shrotlog
+. "${_D0}/shrotlog"
 
 JVM_OPTS_DOCKER='-XX:+StartAttachListener -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap'
 JVM_OPTS_LOGGING='-Dorg.lockss.defaultLogLevel=debug -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -Dorg.springframework.boot.logging.LoggingSystem=none'

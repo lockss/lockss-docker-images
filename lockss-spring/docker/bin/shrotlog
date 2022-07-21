@@ -8,7 +8,7 @@
 # uid to have an entry in /etc/passwd, which our containers don't.)
 
 usage() {
-  echo "usage: shrotlog [-n <num> } [-s <sizemax> ] [ -z ] <file>"
+  echo "usage: shrotlog [-n <num> ] [-s <sizemax> ] [ -z ] <file>"
   echo "  -n <num>      Maintain <num> past log generations (default 5)"
   echo "  -s <sizemax>  Rotate when log exceeds <sizemax> bytes (default 1MB)"
   echo "  -i <interval> Check for rotation every <interval> secs (default 1 hour)"
