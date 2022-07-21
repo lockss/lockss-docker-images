@@ -30,6 +30,9 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 _0="$(basename "${0}")"
+_D0=$(dirname "${0}")
+
+. "${_D0}/shrotlog
 
 JVM_OPTS_DOCKER='-XX:+StartAttachListener -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap'
 JVM_OPTS_LOGGING='-Dorg.lockss.defaultLogLevel=debug -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -Dorg.springframework.boot.logging.LoggingSystem=none'
@@ -204,8 +207,9 @@ Redir_Std() {
   # This script always runs as process 1, don't rely on unique name
   rm -f $npipe
   mknod $npipe p
-  # Run timestamper in background, reading from pipe, appending to output file
-  Add_Timestamp <$npipe >>"${file}" &
+  # Run timestamper and log rotater in background, reading from pipe,
+  # appending to log file
+  ( Add_Timestamp | Cat_And_Rotate -n 5 -s 1048576 -z "${file}" ) <${npipe}  &
   # Close FD 1&2
   exec 1>&-
   exec 2>&-
