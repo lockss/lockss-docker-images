@@ -1,0 +1,96 @@
+#!/bin/sh
+
+# uncomment this to keep the temp log dir after the test exits
+#keep_temp_log_dir=1
+
+scriptdir="$(dirname "${0}")"
+. "${scriptdir}/../docker/bin/shrotlog"
+
+temp_files=""
+# this causes trouble, don't know why
+#trap "Cleanup_Temp" EXIT
+Add_Temp_File() {
+  temp_files="${temp_files} $1"
+}
+Cleanup_Temp() {
+  for f in ${temp_files}; do
+    :
+    rm -rf "${f}"
+  done
+}
+
+Add_Timestamp() {
+  # 09 Jul 21 20:38:26 PDT
+  local fmt="%d %b %y %T %Z "
+  # Fake timestamp so can compare with expected output
+  awk -F"\n" "{print strftime(\"${fmt}\", 123455) \$0; fflush()}"
+}
+
+# $1=log filename
+# redirect stdout/err to log file with timestamps a log rotation
+Redir_Std() {
+  local file="$1"
+  # Create named pipe, delete on exit
+  local npipe=/tmp/$$.ptmp
+  rm -f ${npipe}
+  mknod ${npipe} p
+  Add_Temp_File ${npipe}
+  # Run timestamper in background, reading from pipe, appending to output file
+  ( Add_Timestamp | Cat_And_Rotate -n 4 -s 250 -i 2 -z "${file}" ) <${npipe}  &
+  # Close FD 1&2
+  exec 1>&-
+  exec 2>&-
+  # Redirect FD 1&2 to pipe
+  exec 1>${npipe}
+  exec 2>&1
+}
+
+
+
+logdir="$(mktemp -d)"
+logfile="${logdir}/test.log"
+if [ -z "${keep_temp_log_dir}" ]; then
+  Add_Temp_File "${logdir}"
+fi
+
+exec 3>&2
+
+# save orig stderr in fd 3
+#exec 3>&2
+
+echo "Starting test, should take 15 seconds"
+Redir_Std "${logfile}"
+for i in `seq 1 1 15`; do
+  for j in `seq 1 1 10`; do
+    echo "this is batch $i line $j"
+  done
+  sleep 1
+done
+
+testdir="$(mktemp -d)"
+Add_Temp_File "${testdir}"
+
+#set -x
+# Unpack the expected result log dir to ${testdir}
+cat ${scriptdir}/testlog.tgz | ( cd "${testdir}" ; tar xfz - )
+
+# Can't use diff -r because .gz files have timestamp in header
+ls_act="$(ls ${logdir})"
+ls_exp="$(ls ${testdir})"
+if [ "${ls_exp}" != "${ls_act}" ]; then
+  echo "expected files: (${ls_exp}) != actual files: (${ls_act})" >&3 2>&3
+  exit 1
+fi
+for file in ${ls_exp}; do
+  fexp="${testdir}/${file}"
+  fact="${logdir}/${file}"
+  if zdiff ${fexp} ${fact} >&3 2>&3; then
+    echo "Passed" >&3
+    Cleanup_Temp
+    exit 0
+  else
+    echo "expected file ${fexp}) != actual file ${fact}" >&3 2>&3
+    echo "Failed" >&3
+    exit 1
+  fi
+done

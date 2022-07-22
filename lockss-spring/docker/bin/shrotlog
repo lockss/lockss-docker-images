@@ -1,0 +1,99 @@
+#!/bin/sh
+
+# Write lines to log file, rotate log when needed.
+
+# Useful for logs written using shell redirection, where the shell
+# holds the file open forever and there's no way for logrotate to
+# signal the shell to reopen it.  (Also, logrotate requires the current
+# uid to have an entry in /etc/passwd, which our containers don't.)
+
+usage() {
+  echo "usage: shrotlog [-n <num> ] [-s <sizemax> ] [ -z ] <file>"
+  echo "  -n <num>      Maintain <num> past log generations (default 5)"
+  echo "  -s <sizemax>  Rotate when log exceeds <sizemax> bytes (default 1MB)"
+  echo "  -i <interval> Check for rotation every <interval> secs (default 1 hour)"
+  echo "  -z            GZip rotated log files"
+}
+
+gzip=""
+maxlog=5
+maxsize=`expr "1024 * 1024"`
+check_intrvl=3600
+
+Parse_Args() {
+  while true; do
+    case $1 in
+      -h | --help)
+        usage
+        shift;
+        ;;
+      -n | --numlog)
+        maxlog=$2
+        shift; shift;
+        ;;
+      -s | --sizemax)
+        maxsize=$2
+        shift; shift;
+        ;;
+      -i | --interval)
+        check_intrvl=$2
+        shift; shift;
+        ;;
+      -z | --gzip)
+        gzip=1
+        shift;
+        ;;
+      -* | --*)
+        usage
+        echo "Unknown option $1"
+        exit 1
+        ;;
+      *)
+        logfile="$1"
+        break
+        ;;
+    esac
+  done
+}
+
+Check_Rotate() {
+  if [ -e "${logfile}" ]; then
+    local size=`stat -c %s "${logfile}"`
+    if [ "${size}" -ge "${maxsize}" ]; then
+      Rotate
+    fi
+  fi
+}
+
+Rotate() {
+  for i in `seq "${maxlog}" -1 2`; do
+    local file1="${logfile}.$((i-1))"
+    local file2="${logfile}.$((i))"
+    local file1gz="${file1}.gz"
+    local file2gz="${file2}.gz"
+    if [ -f "${file1}" ]; then
+      mv "${file1}" "${file2}"
+    elif [ -f "${file1gz}" ]; then
+      mv "${file1gz}" "${file2gz}"
+    fi
+  done 
+  if [ -f "${logfile}" ]; then
+    mv "${logfile}" "${logfile}.1"
+    touch "${logfile}"
+    if [ -n "${gzip}" ]; then
+      gzip "${logfile}.1"
+    fi
+  fi
+}
+
+Cat_And_Rotate() {
+  Parse_Args $@
+  local next_check=0
+  while read -r line ; do
+    if [ `date +%s` -ge "${next_check}" ]; then
+      next_check=`expr $(date  +%s) + ${check_intrvl}`
+      Check_Rotate
+    fi
+    printf "%s\n" "$line" >> ${logfile}
+  done
+}
