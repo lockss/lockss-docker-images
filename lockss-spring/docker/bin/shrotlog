@@ -89,7 +89,7 @@ Rotate() {
 Cat_And_Rotate() {
   Parse_Args $@
   local next_check=0
-  while read line ; do
+  while read -r line ; do
     if [ `date +%s` -ge "${next_check}" ]; then
       next_check=`expr $(date  +%s) + ${check_intrvl}`
       Check_Rotate
