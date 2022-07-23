@@ -56,6 +56,7 @@ Parse_Args() {
   done
 }
 
+# If the logfile is larger than the max, rotate it
 Check_Rotate() {
   if [ -e "${logfile}" ]; then
     local size=`stat -c %s "${logfile}"`
@@ -65,27 +66,40 @@ Check_Rotate() {
   fi
 }
 
+# Rotate the logfiles
 Rotate() {
+  # Rename <logfile>.<n-1> to <logfile>.<n>, starting with
+  # <logfile>.<maxlog>, ending with <logfile>.2
   for i in `seq "${maxlog}" -1 2`; do
+    # <logfile>.<n-1>
     local file1="${logfile}.$((i-1))"
+    # <logfile>.<n>
     local file2="${logfile}.$((i))"
+    # <logfile>.<n-1>.gz
     local file1gz="${file1}.gz"
+    # <logfile>.<n>.gz
     local file2gz="${file2}.gz"
+    # If non .gz file exists, rename it
     if [ -f "${file1}" ]; then
       mv "${file1}" "${file2}"
+    # Else if .gz file exists, rename it
     elif [ -f "${file1gz}" ]; then
       mv "${file1gz}" "${file2gz}"
     fi
   done 
+  # Rename <logfile> to <logfile>.0
   if [ -f "${logfile}" ]; then
     mv "${logfile}" "${logfile}.1"
     touch "${logfile}"
+    # Compress it if told to.
     if [ -n "${gzip}" ]; then
       gzip "${logfile}.1"
     fi
   fi
 }
 
+# Read lines from stdin, write to logfile.  Check and possibly rotate
+# every <check_intrvl>.
 Cat_And_Rotate() {
   Parse_Args $@
   local next_check=0

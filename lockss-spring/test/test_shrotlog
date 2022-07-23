@@ -89,7 +89,7 @@ for file in ${ls_exp}; do
     Cleanup_Temp
     exit 0
   else
-    echo "expected file ${fexp}) != actual file ${fact}" >&3 2>&3
+    echo "expected file ${fexp} != actual file ${fact}" >&3 2>&3
     echo "Failed" >&3
     exit 1
   fi
