@@ -312,6 +312,17 @@ if [ "${LOCKSS_IS_POLLER}" = 'true' ]; then
   ARGS_THIS_SERVICE="-s lcapssl:${SECRETS}/lcap-ssl-pass"
 fi
 
+if [ "${LOCKSS_IS_SOAP}" = 'true' ]; then
+
+  #
+  # LOCKSS_IS_SOAP
+  #
+  echo "SOAP service configuration..."
+  ARGS_THIS_SERVICE="--spring.config.location=file:${CONFIGS}/lockss.properties"
+
+fi
+
+
   # (left indented for now to clarify diffs)
 
   #
