@@ -325,7 +325,7 @@ fi
   ARGS_BOOTSTRAP="-b resource:application.properties -b ${LOCKSS_HOME}/etc/lockss_bootstrap_base -b ${CONFIGS}/lockss_bootstrap"
 
   # Cluster configuration
-  if [ "$LOCKSS_NEEDS_SECRETS" = 'true' ]; then
+  if [ "${LOCKSS_NEEDS_SECRETS}" = 'true' ]; then
     Check_Set "${LOCKSS_ADMIN_USER}" LOCKSS_ADMIN_USER
     Check_Set "${SECRETS}"
     Check_Dir_Read "${SECRETS}"
