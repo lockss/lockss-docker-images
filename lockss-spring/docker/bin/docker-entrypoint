@@ -207,9 +207,11 @@ Redir_Std() {
   # This script always runs as process 1, don't rely on unique name
   rm -f $npipe
   mknod $npipe p
-  # Run timestamper and log rotater in background, reading from pipe,
-  # appending to log file
-  ( Add_Timestamp | Cat_And_Rotate -n 5 -s 1048576 -z "${file}" ) <${npipe}  &
+#  # Run timestamper and log rotater in background, reading from pipe,
+#  # appending to log file
+#  ( Add_Timestamp | Cat_And_Rotate -n 5 -s 1048576 -z "${file}" ) <${npipe}  &
+  # Run timestamper in background, reading from pipe, appending to output file
+  Add_Timestamp <$npipe >>"${file}" &
   # Close FD 1&2
   exec 1>&-
   exec 2>&-
