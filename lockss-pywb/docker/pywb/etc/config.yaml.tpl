@@ -29,10 +29,10 @@
 
 collections:
     lockss:
-        archive_paths: http://${REPO_AUTH}@${REPO_HOST}:${REPO_REST_PORT}/warcs/
+        archive_paths: http://${REPO_AUTH}@${REPO_HOST}:${REPO_REST_PORT}/wayback/warcs/
         index:
             type: cdx
-            api_url: http://${REPO_AUTH}@${REPO_HOST}:${REPO_REST_PORT}/cdx/pywb/lockss?url={url}&matchType={matchType}&sort={sort}&closest={closest}&output={output}&fl={fl}
+            api_url: http://${REPO_AUTH}@${REPO_HOST}:${REPO_REST_PORT}/wayback/cdx/pywb/lockss?url={url}&matchType={matchType}&sort={sort}&closest={closest}&output={output}&fl={fl}
             replay_url: ""
 
 # Settings for each collection
