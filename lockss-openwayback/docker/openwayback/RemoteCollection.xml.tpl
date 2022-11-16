@@ -38,7 +38,7 @@
 
     <property name="resourceIndex">
       <bean class="org.archive.wayback.resourceindex.RemoteResourceIndex">
-        <property name="searchUrlBase" value="http://${REPO_HOST}:${REPO_REST_PORT}/wayback/cdx/owb?namespace=${OPENWB_COLLECTION}" />
+        <property name="searchUrlBase" value="http://${REPO_HOST}:${REPO_REST_PORT}/wayback/cdx/owb/${OPENWB_COLLECTION}" />
       </bean>
     </property>
   </bean>
