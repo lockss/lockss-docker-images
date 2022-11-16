@@ -28,7 +28,8 @@
 
 FROM lockss/lockss-ipm:2.3.0-SNAPSHOT AS lockss-ipm
 
-FROM ubuntu:focal-20211006
+# "focal" is 20.04
+FROM ubuntu:focal-20221019
 
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
 
