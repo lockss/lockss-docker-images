@@ -39,9 +39,9 @@ POSSIBILITY OF SUCH DAMAGE.
     <Property name="log.dir">${LOCKSS_LOGS}</Property>
     <Property name="log.file">daemon</Property>
 
-    <!-- roll over into five 100MB files -->
-    <Property name="log.rollingfile.sizetrigger">50 MB</Property>
-    <Property name="log.rollingfile.maxrollover">10</Property>
+<!--     <!-\- roll over into five 100MB files -\-> -->
+<!--     <Property name="log.rollingfile.sizetrigger">50 MB</Property> -->
+<!--     <Property name="log.rollingfile.maxrollover">10</Property> -->
 
     <!-- log only FATAL messages to console -->
     <Property name="level.min.console">FATAL</Property>
