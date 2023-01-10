@@ -1,5 +1,4 @@
-# Copyright (c) 2000-2019, Board of Trustees of Leland Stanford Jr. University
-# All rights reserved.
+# Copyright (c) 2000-2023, Board of Trustees of Leland Stanford Jr. University
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -27,9 +26,10 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-ipm:2.1 AS lockss-ipm
+FROM lockss/lockss-ipm:2.4.0 AS lockss-ipm
 
-FROM ubuntu:xenial-20190222
+# "focal" is 20.04
+FROM ubuntu:focal-20221130
 
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
 
