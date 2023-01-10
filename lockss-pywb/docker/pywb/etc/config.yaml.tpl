@@ -1,5 +1,4 @@
-# Copyright (c) 2000-2019, Board of Trustees of Leland Stanford Jr. University
-# All rights reserved.
+# Copyright (c) 2000-2023, Board of Trustees of Leland Stanford Jr. University
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -29,10 +28,10 @@
 
 collections:
     lockss:
-        archive_paths: http://${REPO_AUTH}@${REPO_HOST}:${REPO_REST_PORT}/warcs/
+        archive_paths: http://${REPO_AUTH}@${REPO_HOST}:${REPO_REST_PORT}/wayback/warcs/
         index:
             type: cdx
-            api_url: http://${REPO_AUTH}@${REPO_HOST}:${REPO_REST_PORT}/cdx/pywb/lockss?url={url}&matchType={matchType}&sort={sort}&closest={closest}&output={output}&fl={fl}
+            api_url: http://${REPO_AUTH}@${REPO_HOST}:${REPO_REST_PORT}/wayback/cdx/pywb/lockss?url={url}&matchType={matchType}&sort={sort}&closest={closest}&output={output}&fl={fl}
             replay_url: ""
 
 # Settings for each collection
