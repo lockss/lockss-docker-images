@@ -26,10 +26,10 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-ipm:2.3.0-SNAPSHOT AS lockss-ipm
+FROM lockss/lockss-ipm:2.4.0-SNAPSHOT AS lockss-ipm
 
 # "focal" is 20.04
-FROM ubuntu:focal-20221019
+FROM ubuntu:focal-20221130
 
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
 
