@@ -1,7 +1,6 @@
 #!/bin/sh
 
-# Copyright (c) 2000-2021, Board of Trustees of Leland Stanford Jr. University
-# All rights reserved.
+# Copyright (c) 2000-2023, Board of Trustees of Leland Stanford Jr. University
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -30,6 +29,9 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 _0="$(basename "${0}")"
+_D0=$(dirname "${0}")
+
+. "${_D0}/shrotlog"
 
 JVM_OPTS_DOCKER='-XX:+StartAttachListener -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap'
 JVM_OPTS_LOGGING='-Dorg.lockss.defaultLogLevel=debug -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -Dorg.springframework.boot.logging.LoggingSystem=none'
@@ -204,6 +206,9 @@ Redir_Std() {
   # This script always runs as process 1, don't rely on unique name
   rm -f $npipe
   mknod $npipe p
+#  # Run timestamper and log rotater in background, reading from pipe,
+#  # appending to log file
+#  ( Add_Timestamp | Cat_And_Rotate -n 5 -s 1048576 -z "${file}" ) <${npipe}  &
   # Run timestamper in background, reading from pipe, appending to output file
   Add_Timestamp <$npipe >>"${file}" &
   # Close FD 1&2
@@ -321,6 +326,12 @@ fi
   ARGS_BOOTSTRAP="-b resource:application.properties -b ${LOCKSS_HOME}/etc/lockss_bootstrap_base -b ${CONFIGS}/lockss_bootstrap"
 
   # Cluster configuration
+  if [ "${LOCKSS_NEEDS_SECRETS}" = 'true' ]; then
+    Check_Set "${LOCKSS_ADMIN_USER}" LOCKSS_ADMIN_USER
+    Check_Set "${SECRETS}"
+    Check_Dir_Read "${SECRETS}"
+    Check_File "${SECRETS}/lockss_ui_pass"
+  fi
 
   echo "Cluster configuration..."
   if [ "${LOCKSS_IS_CONFIG}" = 'true' ]; then
@@ -335,10 +346,7 @@ fi
     # !LOCKSS_IS_CONFIG
     #
     Check_Set "${LOCKSS_CONFIG_URL}" LOCKSS_CONFIG_URL
-    Check_Set "${LOCKSS_ADMIN_USER}" LOCKSS_ADMIN_USER
-    Check_Set "${SECRETS}"
-    Check_Dir_Read "${SECRETS}"
-    Check_File "${SECRETS}/lockss_ui_pass"
+
 #    LOCKSS_CONFIG_URL="${LOCKSS_CONFIG_URL%%://*}://$(Url_Encode "${LOCKSS_ADMIN_USER}"):$(Url_Encode "$(cat "${SECRETS}/lockss_ui_pass")")@${LOCKSS_CONFIG_URL#*://}"
     ARGS_CLUSTER="-c ${LOCKSS_CONFIG_URL} -l ${LOCKSS_CONFIG_URL}/config/file/cluster"
   fi

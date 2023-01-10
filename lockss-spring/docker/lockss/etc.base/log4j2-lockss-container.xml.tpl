@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-Copyright (c) 2000-2019, Board of Trustees of Leland Stanford Jr. University
-All rights reserved.
+Copyright (c) 2000-2023, Board of Trustees of Leland Stanford Jr. University
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -39,9 +38,9 @@ POSSIBILITY OF SUCH DAMAGE.
     <Property name="log.dir">${LOCKSS_LOGS}</Property>
     <Property name="log.file">daemon</Property>
 
-    <!-- roll over into five 100MB files -->
-    <Property name="log.rollingfile.sizetrigger">10 MB</Property>
-    <Property name="log.rollingfile.maxrollover">5</Property>
+<!--     <!-\- roll over into five 100MB files -\-> -->
+<!--     <Property name="log.rollingfile.sizetrigger">50 MB</Property> -->
+<!--     <Property name="log.rollingfile.maxrollover">10</Property> -->
 
     <!-- log only FATAL messages to console -->
     <Property name="level.min.console">FATAL</Property>
