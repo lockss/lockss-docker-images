@@ -406,7 +406,8 @@ echo "ARGS_ADDITIONAL=${ARGS_ADDITIONAL}"
 echo "*************** JVM INVOCATION ***************"
 echo "$$" > "${PID_FILE}"
 rm -f "${STARTUP_FILE}"
-exec java ${JVM_OPTS_DOCKER} \
+exec java ${JVM_OPTS_SERVICE_ID} \
+          ${JVM_OPTS_DOCKER} \
           ${JVM_OPTS_LOGGING} \
           ${JVM_OPTS_TMP} \
           ${JVM_OPTS_THIS_SERVICE} \
