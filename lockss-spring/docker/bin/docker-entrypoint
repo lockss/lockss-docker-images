@@ -238,8 +238,10 @@ LOCKSS_LOGFILE="${LOCKSS_LOGS}/stdout.log"
 
 # Redirect stdout and stderr to file
 
-echo "$(date) Redirecting stdout and stderr to ${LOCKSS_LOGFILE}."
-Redir_Std "${LOCKSS_LOGFILE}"
+if [ -z "${SUPPRESS_STD_REDIR}" ]; then
+  echo "$(date) Redirecting stdout and stderr to ${LOCKSS_LOGFILE}."
+  Redir_Std "${LOCKSS_LOGFILE}"
+fi
 
 echo "$$" > "${STARTUP_FILE}"
 rm -f "${PID_FILE}"
