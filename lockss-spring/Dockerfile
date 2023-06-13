@@ -28,7 +28,7 @@
 
 FROM lockss/lockss-alpine:3.15.0-2-SNAPSHOT as lockss-alpine
 
-FROM adoptopenjdk/openjdk8:jdk8u292-b10-alpine
+FROM eclipse-temurin:11.0.19_7-jre-alpine
 
 COPY --from=lockss-alpine /usr/local/etc/ipm/* /usr/local/etc/ipm/
 COPY --from=lockss-alpine /usr/local/bin/* /usr/local/bin/
