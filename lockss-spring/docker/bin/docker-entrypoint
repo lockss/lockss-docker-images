@@ -377,7 +377,8 @@ fi
 
 # Temp directory handling
 
-Temp_Dir_Cleanup
+# Now done in daemon
+# Temp_Dir_Cleanup
 
 # Log4j config
 
