@@ -26,9 +26,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-alpine:3.18.0-1-SNAPSHOT as lockss-alpine
+FROM lockss/lockss-alpine:3.18.2-1-SNAPSHOT as lockss-alpine
 
-FROM adoptopenjdk/openjdk8:jdk8u372-b07-alpine
+FROM adoptopenjdk/openjdk8:jdk8u372-b07-alpine-slim
 
 COPY --from=lockss-alpine /usr/local/etc/ipm/* /usr/local/etc/ipm/
 COPY --from=lockss-alpine /usr/local/bin/* /usr/local/bin/
