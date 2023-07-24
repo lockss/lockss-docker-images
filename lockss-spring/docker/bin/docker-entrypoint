@@ -238,8 +238,10 @@ LOCKSS_LOGFILE="${LOCKSS_LOGS}/stdout.log"
 
 # Redirect stdout and stderr to file
 
-echo "$(date) Redirecting stdout and stderr to ${LOCKSS_LOGFILE}."
-Redir_Std "${LOCKSS_LOGFILE}"
+if [ -z "${SUPPRESS_STD_REDIR}" ]; then
+  echo "$(date) Redirecting stdout and stderr to ${LOCKSS_LOGFILE}."
+  Redir_Std "${LOCKSS_LOGFILE}"
+fi
 
 echo "$$" > "${STARTUP_FILE}"
 rm -f "${PID_FILE}"
@@ -375,7 +377,8 @@ fi
 
 # Temp directory handling
 
-Temp_Dir_Cleanup
+# Now done in daemon
+# Temp_Dir_Cleanup
 
 # Log4j config
 
@@ -412,6 +415,7 @@ exec java ${JVM_OPTS_DOCKER} \
           ${JVM_OPTS_THIS_SERVICE} \
           ${JVM_OPTS_ADDITIONAL} \
           -jar "${LOCKSS_JAR}" \
+          ${JVM_OPTS_SERVICE_ID} \
           ${ARGS_BOOTSTRAP} \
           ${ARGS_CLUSTER} \
           ${ARGS_SERVICE} \
