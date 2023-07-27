@@ -422,7 +422,7 @@ exec java ${JVM_OPTS_DOCKER} \
           ${ARGS_BOOTSTRAP} \
           ${ARGS_CLUSTER} \
           ${ARGS_SERVICE} \
+          ${ARGS_LOCAL_CONFIG_SECTION} \
           ${ARGS_GROUP} \
           ${ARGS_THIS_SERVICE} \
-          ${ARGS_LOCAL_CONFIG_SECTION} \
           ${ARGS_ADDITIONAL}
