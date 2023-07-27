@@ -288,6 +288,7 @@ echo "Done layering configuration."
 # Relevant for all services
 ARGS_BOOTSTRAP=''
 ARGS_CLUSTER=''
+ARGS_LOCAL_CONFIG_SECTION=''
 ARGS_SERVICE=''
 ARGS_GROUP=''
 
@@ -351,6 +352,7 @@ fi
 
 #    LOCKSS_CONFIG_URL="${LOCKSS_CONFIG_URL%%://*}://$(Url_Encode "${LOCKSS_ADMIN_USER}"):$(Url_Encode "$(cat "${SECRETS}/lockss_ui_pass")")@${LOCKSS_CONFIG_URL#*://}"
     ARGS_CLUSTER="-c ${LOCKSS_CONFIG_URL} -l ${LOCKSS_CONFIG_URL}/config/file/cluster"
+    ARGS_LOCAL_CONFIG_SECTION=" -l ${LOCKSS_CONFIG_URL}/config/file/local-config"
   fi
 
   # Service configuration
@@ -401,6 +403,7 @@ echo "JVM_OPTS_THIS_SERVICE=${JVM_OPTS_THIS_SERVICE}"
 echo "JVM_OPTS_ADDITIONAL=${JVM_OPTS_ADDITIONAL}"
 echo "ARGS_BOOTSTRAP=${ARGS_BOOTSTRAP}"
 echo "ARGS_CLUSTER=${ARGS_CLUSTER}"
+echo "ARGS_LOCAL_CONFIG_SECTION=${ARGS_LOCAL_CONFIG_SECTION}"
 echo "ARGS_SERVICE=${ARGS_SERVICE}"
 echo "ARGS_GROUP=${ARGS_GROUP}"
 echo "ARGS_THIS_SERVICE=${ARGS_THIS_SERVICE}"
@@ -421,4 +424,5 @@ exec java ${JVM_OPTS_DOCKER} \
           ${ARGS_SERVICE} \
           ${ARGS_GROUP} \
           ${ARGS_THIS_SERVICE} \
+          ${ARGS_LOCAL_CONFIG_SECTION} \
           ${ARGS_ADDITIONAL}
