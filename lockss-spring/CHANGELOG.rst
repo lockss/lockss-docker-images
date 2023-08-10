@@ -6,7 +6,7 @@ Release Notes
 2.10.0
 ------
 
-Released: ???
+Released: 2023-08-09
 
 Features
 ========
