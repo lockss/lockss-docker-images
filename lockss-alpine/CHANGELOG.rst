@@ -6,7 +6,7 @@ Release Notes
 3.18.2-1
 --------
 
-Released: ???
+Released: 2023-08-09
 
 Features
 ========
