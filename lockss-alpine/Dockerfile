@@ -26,7 +26,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-ipm:2.5.0-SNAPSHOT as lockss-ipm
+FROM lockss/lockss-ipm:2.6.0-SNAPSHOT as lockss-ipm
 
 FROM alpine:3.18.2
 
@@ -36,3 +36,4 @@ COPY --from=lockss-ipm /usr/local/etc/ipm/* /usr/local/etc/ipm/
 COPY --from=lockss-ipm /usr/local/bin/* /usr/local/bin/
 
 RUN ipm-setup
+
