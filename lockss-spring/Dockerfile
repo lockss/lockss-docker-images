@@ -138,6 +138,9 @@ RUN ipm-update \
  && mkdir -m 0755 "${LOCKSS_HOME}" \
  && mkdir -m 0777 "${LOCKSS_HOME}/etc"
 
+# Install gcompat under AlpineLinux
+RUN [ "$( . /etc/os-release && echo "${ID}")" = 'alpine' ] && apk add gcompat
+
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 
 #HEALTHCHECK --retries=1 --start-period=60s CMD ["/usr/local/bin/docker-healthcheck"]
