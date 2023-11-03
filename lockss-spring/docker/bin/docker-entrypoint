@@ -303,7 +303,7 @@ if [ "${LOCKSS_IS_REPO}" = 'true' ]; then
   # LOCKSS_IS_REPO
   #
   echo "Repository service configuration..."
-  ARGS_THIS_SERVICE="--spring.config.location=file:${CONFIGS}/lockss.properties -s solr:${SECRETS}/solr-auth"
+  ARGS_THIS_SERVICE="--spring.config.location=classpath:/application.properties,file:${CONFIGS}/lockss.properties -s solr:${SECRETS}/solr-auth"
 
 fi
 
