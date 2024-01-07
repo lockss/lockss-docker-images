@@ -8,6 +8,8 @@ Release Notes
 
 Released: ???
 
+* Disabled stdout log timestamps for now
+
 ------
 2.10.0
 ------

@@ -40,6 +40,7 @@ LOCKSS_TMP_TRASH="${LOCKSS_TMP}/../lockss-trash"
 LOCKSS_JAR="${LOCKSS_HOME}/lib/lockss.jar"
 STARTUP_FILE="${LOCKSS_PIDS}/${_0}.startup"
 PID_FILE="${LOCKSS_PIDS}/${_0}.pid"
+SUPPRESS_STD_REDIR=1            # disable stdout timestamp mechanism
 
 # $1=exitcode
 Exit()
