@@ -299,7 +299,9 @@ JVM_OPTS_THIS_SERVICE=''
 ARGS_THIS_SERVICE=''
 
 if [ "${LOCKSS_IS_REPO}" = 'true' ]; then
-  Check_File "${SECRETS}/solr-auth"
+  if [ "${USE_SOLR_INDEX}" = 'true' ]; then
+    Check_File "${SECRETS}/solr-auth"
+  fi
 
   #
   # LOCKSS_IS_REPO
