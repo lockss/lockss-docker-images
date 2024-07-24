@@ -8,7 +8,7 @@ Release Notes
 
 Released: 2024-07-24
 
-No changes since 2.5.0.
+* Upgraded to Busybox 1.36.1
 
 -----
 2.5.0
