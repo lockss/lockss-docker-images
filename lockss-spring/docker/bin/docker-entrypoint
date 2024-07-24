@@ -33,13 +33,15 @@ _D0=$(dirname "${0}")
 
 . "${_D0}/shrotlog"
 
-JVM_OPTS_DOCKER='-XX:+StartAttachListener -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap'
+JVM_OPTS_DOCKER='-XX:+StartAttachListener -XX:+UnlockExperimentalVMOptions -XX:+UseContainerSupport'
 JVM_OPTS_LOGGING='-Dorg.lockss.defaultLogLevel=debug -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -Dorg.springframework.boot.logging.LoggingSystem=none'
+JVM_OPTS_OPENS="--add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
 JVM_OPTS_TMP="-Djava.io.tmpdir=${LOCKSS_TMP}"
 LOCKSS_TMP_TRASH="${LOCKSS_TMP}/../lockss-trash"
 LOCKSS_JAR="${LOCKSS_HOME}/lib/lockss.jar"
 STARTUP_FILE="${LOCKSS_PIDS}/${_0}.startup"
 PID_FILE="${LOCKSS_PIDS}/${_0}.pid"
+#SUPPRESS_STD_REDIR=1    # let the env set this.
 
 # $1=exitcode
 Exit()
@@ -303,7 +305,7 @@ if [ "${LOCKSS_IS_REPO}" = 'true' ]; then
   # LOCKSS_IS_REPO
   #
   echo "Repository service configuration..."
-  ARGS_THIS_SERVICE="--spring.config.location=file:${CONFIGS}/lockss.properties -s solr:${SECRETS}/solr-auth"
+  ARGS_THIS_SERVICE="--spring.config.location=classpath:/application.properties,file:${CONFIGS}/lockss.properties -s solr:${SECRETS}/solr-auth"
 
 fi
 
@@ -413,6 +415,7 @@ echo "*************** JVM INVOCATION ***************"
 echo "$$" > "${PID_FILE}"
 rm -f "${STARTUP_FILE}"
 exec java ${JVM_OPTS_DOCKER} \
+          ${JVM_OPTS_OPENS} \
           ${JVM_OPTS_LOGGING} \
           ${JVM_OPTS_TMP} \
           ${JVM_OPTS_THIS_SERVICE} \

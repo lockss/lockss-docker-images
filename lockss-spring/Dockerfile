@@ -26,9 +26,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-alpine:3.18.2-1 as lockss-alpine
+FROM lockss/lockss-alpine:3.19.1-1 as lockss-alpine
 
-FROM adoptopenjdk/openjdk8:jdk8u372-b07-alpine-slim
+FROM eclipse-temurin:17.0.10_7-jre-alpine
 
 COPY --from=lockss-alpine /usr/local/etc/ipm/* /usr/local/etc/ipm/
 COPY --from=lockss-alpine /usr/local/bin/* /usr/local/bin/
@@ -137,6 +137,9 @@ RUN ipm-update \
  && ipm-clean \
  && mkdir -m 0755 "${LOCKSS_HOME}" \
  && mkdir -m 0777 "${LOCKSS_HOME}/etc"
+
+# Install gcompat under AlpineLinux
+RUN [ "$( . /etc/os-release && echo "${ID}")" = 'alpine' ] && apk add gcompat
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 
