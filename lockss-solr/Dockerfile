@@ -26,7 +26,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-ubuntu:focal-20221130-SNAPSHOT AS lockss-ubuntu
+FROM lockss/lockss-ubuntu:focal-20221130-1 AS lockss-ubuntu
 
 FROM solr:8.11.2-slim
 
