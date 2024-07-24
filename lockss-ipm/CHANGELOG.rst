@@ -3,6 +3,14 @@ Release Notes
 =============
 
 -----
+2.6.0
+-----
+
+Released: 2024-07-24
+
+* Upgraded to Busybox 1.36.1
+
+-----
 2.5.0
 -----
 
