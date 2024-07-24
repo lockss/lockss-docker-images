@@ -6,7 +6,9 @@ Release Notes
 2.6.0
 -----
 
-Released: ???
+Released: 2024-07-24
+
+No changes since 2.5.0.
 
 -----
 2.5.0
