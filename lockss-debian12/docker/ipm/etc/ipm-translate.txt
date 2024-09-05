@@ -17,7 +17,7 @@ links	links
 lynx	lynx
 mtr	mtr
 nano	nano
-netcat	netcat
+netcat	netcat-traditional
 openjdk8	FIXME
 openjdk8-jre	FIXME
 openssh-client	openssh-client
