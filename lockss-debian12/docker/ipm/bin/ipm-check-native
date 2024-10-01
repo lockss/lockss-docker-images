@@ -1,4 +1,6 @@
-# Copyright (c) 2000-2023, Board of Trustees of Leland Stanford Jr. University
+#!/bin/sh
+
+# Copyright (c) 2000-2024, Board of Trustees of Leland Stanford Jr. University
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -26,13 +28,4 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-ipm:2.3.0-SNAPSHOT AS lockss-ipm
-
-FROM debian:11.1-slim
-
-MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
-
-# Install IPM
-COPY --from=lockss-ipm /usr/local/etc/ipm/* /usr/local/etc/ipm/
-COPY --from=lockss-ipm /usr/local/bin/* /usr/local/bin/
-RUN ipm-setup apt-transport-https
+dpkg --status "${1}" 2> /dev/null | grep --quiet 'Status:.*installed'

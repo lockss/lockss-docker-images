@@ -35,7 +35,7 @@ _D0=$(dirname "${0}")
 
 JVM_OPTS_DOCKER='-XX:+StartAttachListener -XX:+UnlockExperimentalVMOptions -XX:+UseContainerSupport'
 JVM_OPTS_LOGGING='-Dorg.lockss.defaultLogLevel=debug -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager -Dorg.springframework.boot.logging.LoggingSystem=none'
-JVM_OPTS_OPENS="--add-opens java.base/java.util=ALL-UNNAMED"
+JVM_OPTS_OPENS="--add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED"
 JVM_OPTS_TMP="-Djava.io.tmpdir=${LOCKSS_TMP}"
 LOCKSS_TMP_TRASH="${LOCKSS_TMP}/../lockss-trash"
 LOCKSS_JAR="${LOCKSS_HOME}/lib/lockss.jar"

@@ -3,11 +3,21 @@ Release Notes
 =============
 
 ------
+2.12.0
+------
+
+???
+
+------
 2.11.0
 ------
 
-Released: ???
+Released: 2024-07-24
 
+* Switched to Eclipse Temurin 17.0.10_7
+* Added support for Java 17
+* Added support for log rotation and redirection
+* Added support for additional user configuration 
 * Disabled stdout log timestamps for now
 
 ------
