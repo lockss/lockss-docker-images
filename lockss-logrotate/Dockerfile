@@ -38,5 +38,4 @@ RUN apk --update add --no-cache logrotate && \
 ADD docker/etc/logrotate.conf /etc/logrotate.conf
 RUN chmod 0400 /etc/logrotate.conf
 
-# Q: Does the state file need to persist?
 CMD ["/usr/sbin/logrotate", "-v", "-f", "--state", "/var/run/logrotate", "/etc/logrotate.conf"]
