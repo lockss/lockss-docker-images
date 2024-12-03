@@ -33,7 +33,7 @@ TAG_FILE="${ROOT_DIR}/VERSION"
 TAG="lockss/lockss-logrotate:$(cat "${TAG_FILE}")"
 
 PUSH=''
-if [ "${1}" == '--push' ]; then
+if [ "${1}" = '--push' ]; then
   PUSH='true'
   shift
 fi
