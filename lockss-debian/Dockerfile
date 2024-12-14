@@ -26,11 +26,14 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-ipm:2.5.0-SNAPSHOT AS lockss-ipm
+FROM lockss/lockss-ipm:2.7.0-SNAPSHOT AS lockss-ipm
 
 FROM debian:9.13-slim
 
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
+
+# Debian 9.13 is too old, its package repositories have been archived
+COPY /docker/apt/sources.list /etc/apt/
 
 # Install IPM
 COPY --from=lockss-ipm /usr/local/etc/ipm/* /usr/local/etc/ipm/

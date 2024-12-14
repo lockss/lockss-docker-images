@@ -26,7 +26,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-debian:9.13-slim-2-SNAPSHOT AS lockss-debian
+FROM lockss/lockss-debian:9.13-slim-3-SNAPSHOT AS lockss-debian
 
 FROM lockss/lockss-files-log4j:2.24.3-1-SNAPSHOT AS lockss-files-log4j
 
@@ -41,6 +41,9 @@ ENV LOCKSS_WAIT_FOR_PORT_TIMEOUT=3 \
     SECRETS=/run/secrets \
     OPENWB_COLLECTION=lockss \
     LOCKSS_LOGS=/var/log/lockss
+
+# Debian 9.13 is too old, its package repositories have been archived
+COPY --from=lockss-debian /etc/apt/sources.list /etc/apt/sources.list
 
 # Inherit IPM from lockss-debian
 COPY --from=lockss-debian /usr/local/etc/ipm/* /usr/local/etc/ipm/
