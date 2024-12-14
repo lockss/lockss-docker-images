@@ -32,6 +32,8 @@ FROM lockss/lockss-files-log4j:2.24.3-1-SNAPSHOT AS lockss-files-log4j
 
 FROM iipc/openwayback:openwayback-2.4.0
 
+ARG OPENWAYBACK_VERSION=2.4.0
+
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
 
 ENV LOCKSS_WAIT_FOR_PORT_TIMEOUT=3 \
@@ -56,6 +58,10 @@ COPY --from=lockss-files-log4j /lockss-files-log4j/log4j-api-*.jar \
                                /lockss-files-log4j/log4j-core-*.jar \
                                /lockss-files-log4j/log4j-1.2-api-*.jar \
                                /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/
+
+# Inject modified JAR
+RUN rm /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/openwayback-core-${OPENWAYBACK_VERSION}.jar
+COPY /docker/openwayback-core/openwayback-core-${OPENWAYBACK_VERSION}.jar /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/
 
 COPY /docker/openwayback/* /usr/local/share/lockss-openwayback/
 COPY /docker/bin/* /usr/local/bin/
