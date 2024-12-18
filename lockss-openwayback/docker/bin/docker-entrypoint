@@ -151,6 +151,10 @@ Check_Set "${REPO_REST_PORT}" REPO_REST_PORT
 
 Check_Set "${OPENWB_COLLECTION}"
 
+Check_Set "${SECRETS}" SECRETS
+Check_File "${SECRETS}/lockss-auth"
+export REPO_AUTH="$(Url_Encode "$(cut -d : -f 1 "${SECRETS}/lockss-auth")"):$(Url_Encode "$(cut -d : -f 2- "${SECRETS}/lockss-auth")")"
+
 # Layer configuration
 
 echo "$(date) Layering configuration..."
