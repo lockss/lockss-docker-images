@@ -1,4 +1,4 @@
-# Copyright (c) 2000-2023, Board of Trustees of Leland Stanford Jr. University
+# Copyright (c) 2000-2024, Board of Trustees of Leland Stanford Jr. University
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -26,11 +26,13 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-debian:9.13-slim-2-SNAPSHOT AS lockss-debian
+FROM lockss/lockss-debian:9.13-slim-3-SNAPSHOT AS lockss-debian
 
-FROM lockss/lockss-files-log4j:2.19.0-2-SNAPSHOT AS lockss-files-log4j
+FROM lockss/lockss-files-log4j:2.24.3-1-SNAPSHOT AS lockss-files-log4j
 
 FROM iipc/openwayback:openwayback-2.4.0
+
+ARG OPENWAYBACK_VERSION=2.4.0
 
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
 
@@ -41,6 +43,9 @@ ENV LOCKSS_WAIT_FOR_PORT_TIMEOUT=3 \
     SECRETS=/run/secrets \
     OPENWB_COLLECTION=lockss \
     LOCKSS_LOGS=/var/log/lockss
+
+# Debian 9.13 is too old, its package repositories have been archived
+COPY --from=lockss-debian /etc/apt/sources.list /etc/apt/sources.list
 
 # Inherit IPM from lockss-debian
 COPY --from=lockss-debian /usr/local/etc/ipm/* /usr/local/etc/ipm/
@@ -53,6 +58,10 @@ COPY --from=lockss-files-log4j /lockss-files-log4j/log4j-api-*.jar \
                                /lockss-files-log4j/log4j-core-*.jar \
                                /lockss-files-log4j/log4j-1.2-api-*.jar \
                                /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/
+
+# Inject modified JAR
+RUN rm /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/openwayback-core-${OPENWAYBACK_VERSION}.jar
+COPY /docker/openwayback-core/openwayback-core-${OPENWAYBACK_VERSION}.jar /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/
 
 COPY /docker/openwayback/* /usr/local/share/lockss-openwayback/
 COPY /docker/bin/* /usr/local/bin/

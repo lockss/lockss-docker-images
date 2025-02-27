@@ -1,4 +1,4 @@
-# Copyright (c) 2000-2023, Board of Trustees of Leland Stanford Jr. University
+# Copyright (c) 2000-2024, Board of Trustees of Leland Stanford Jr. University
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -26,16 +26,16 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-ipm:2.7.0-SNAPSHOT AS lockss-ipm
-
-FROM debian:9.13-slim
+FROM lockss/lockss-alpine:3.19.1-2-SNAPSHOT
 
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
 
-# Debian 9.13 is too old, its package repositories have been archived
-COPY /docker/apt/sources.list /etc/apt/
+USER root
 
-# Install IPM
-COPY --from=lockss-ipm /usr/local/etc/ipm/* /usr/local/etc/ipm/
-COPY --from=lockss-ipm /usr/local/bin/* /usr/local/bin/
-RUN ipm-setup apt-transport-https
+RUN apk --update add --no-cache logrotate && \
+    rm -f /etc/logrotate.d/*
+
+ADD docker/etc/logrotate.conf /etc/logrotate.conf
+RUN chmod 0400 /etc/logrotate.conf
+
+CMD ["/usr/sbin/logrotate", "-v", "-f", "--state", "/var/run/logrotate", "/etc/logrotate.conf"]

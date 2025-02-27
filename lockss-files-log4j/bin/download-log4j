@@ -1,4 +1,6 @@
-# Copyright (c) 2000-2023, Board of Trustees of Leland Stanford Jr. University
+#!/bin/sh
+
+# Copyright (c) 2000-2024, Board of Trustees of Leland Stanford Jr. University
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -26,16 +28,15 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-ipm:2.7.0-SNAPSHOT AS lockss-ipm
+_0="$(basename "${0}")"
+_D0="$(cd "$(dirname "${0}")" && pwd)"
 
-FROM debian:9.13-slim
+VER="${1}"
 
-MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
+if [ -z "${VER}" ] ; then
+  echo "${_0}: no version supplied" >&2
+  exit 1
+fi
 
-# Debian 9.13 is too old, its package repositories have been archived
-COPY /docker/apt/sources.list /etc/apt/
-
-# Install IPM
-COPY --from=lockss-ipm /usr/local/etc/ipm/* /usr/local/etc/ipm/
-COPY --from=lockss-ipm /usr/local/bin/* /usr/local/bin/
-RUN ipm-setup apt-transport-https
+cd "${_D0}/../docker/log4j" \
+&& wget `for a in log4j-1.2-api log4j-api log4j-core log4j-slf4j-impl log4j-web ; do echo "https://repo1.maven.org/maven2/org/apache/logging/log4j/${a}/${VER}/${a}-${VER}.jar" ; done`
