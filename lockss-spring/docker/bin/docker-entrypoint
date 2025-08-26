@@ -302,16 +302,17 @@ JVM_OPTS_THIS_SERVICE=''
 ARGS_THIS_SERVICE=''
 
 if [ "${LOCKSS_IS_REPO}" = 'true' ]; then
-  if [ "${USE_SOLR_INDEX}" = 'true' ]; then
-    Check_File "${SECRETS}/solr-auth"
-  fi
 
   #
   # LOCKSS_IS_REPO
   #
   echo "Repository service configuration..."
-  ARGS_THIS_SERVICE="--spring.config.location=classpath:/application.properties,file:${CONFIGS}/lockss.properties -s solr:${SECRETS}/solr-auth"
+  ARGS_THIS_SERVICE="--spring.config.location=classpath:/application.properties,file:${CONFIGS}/lockss.properties"
 
+  if [ "${USE_SOLR_INDEX}" = 'true' ]; then
+    Check_File "${SECRETS}/solr-auth"
+    ARGS_THIS_SERVICE="${ARGS_THIS_SERVICE} -s solr:${SECRETS}/solr-auth"
+  fi
 fi
 
 if [ "${LOCKSS_IS_POLLER}" = 'true' ]; then
