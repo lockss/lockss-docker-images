@@ -1,11 +1,14 @@
 # LOCKSS OpenWayback Docker Image
 
-This Dockerfile defines a slightly LOCKSS-specialized OpenWayback Docker image based on `iipc/openwayback`.
-
-See Docker Hub for available tags: <https://hub.docker.com/r/lockss/lockss-openwayback>
+This Dockerfile is used to build the LOCKSS-customized OpenWayback Docker image based on a fork of `iipc/openwayback`.
 
 # Building
 
-1. Build (github:lockss/)openwayback/openwayback-core with Java 8
-2. Copy openwayback/openwayback-core/target/openwayback-core-2.4.0.jar to lockss-docker-images/lockss-openwayback/docker/openwayback-core
-3. bin/build
+1. Download the latest `lockss/lockss-ipm` and `lockss/lockss-debian` Docker images into your development environment.
+   Alternatively, build these images (recommended).
+2. Build the `iipc/openwayback:2.4.1-SNAPSHOT` image from our clone of the official IIPC project:
+   * `git clone git@github.com:lockss/openwayback.git && cd openwayback`
+   * `docker build -t iipc/openwayback-2.4.1-SNAPSHOT .`
+3. Build the `lockss/lockss-openwayback` Docker image:
+   * `cd lockss-docker-images/lockss-openwayback`
+   * `bin/build`
