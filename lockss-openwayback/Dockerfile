@@ -30,7 +30,7 @@ FROM lockss/lockss-debian:9.13-slim-3-SNAPSHOT AS lockss-debian
 
 FROM lockss/lockss-files-log4j:2.24.3-1-SNAPSHOT AS lockss-files-log4j
 
-FROM iipc/openwayback:2.4.1-SNAPSHOT
+FROM iipc/openwayback:2.4.1-1-SNAPSHOT
 
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
 
