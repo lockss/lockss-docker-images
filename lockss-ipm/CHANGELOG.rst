@@ -6,7 +6,9 @@ Release Notes
 2.7.0
 -----
 
-???
+Released: 2026-04-02
+
+No substantial changes since 2.6.0.
 
 -----
 2.6.0
