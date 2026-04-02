@@ -28,17 +28,15 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-ROOT_DIR="$(realpath "$(dirname "${0}")/..")"
-TAG_FILE="${ROOT_DIR}/VERSION"
-TAG="lockss/lockss-files-log4j:$(cat "${TAG_FILE}")"
+_0="$(basename "${0}")"
+_D0="$(cd "$(dirname "${0}")" && pwd)"
 
-PUSH=''
-if [ "${1}" = '--push' ]; then
-  PUSH='true'
-  shift
+VER="${1}"
+
+if [ -z "${VER}" ] ; then
+  echo "${_0}: no version supplied" >&2
+  exit 1
 fi
 
-docker build --tag "${TAG}" "$@" "${ROOT_DIR}" \
-&& if [ -n "${PUSH}" ]; then
-     docker push "${TAG}"
-   fi
+cd "${_D0}/../docker/log4j" \
+&& wget `for a in log4j-1.2-api log4j-api log4j-core log4j-slf4j-impl log4j-web ; do echo "https://repo1.maven.org/maven2/org/apache/logging/log4j/${a}/${VER}/${a}-${VER}.jar" ; done`
