@@ -1,4 +1,4 @@
-# Copyright (c) 2000-2023, Board of Trustees of Leland Stanford Jr. University
+# Copyright (c) 2000-2026, Board of Trustees of Leland Stanford Jr. University
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -26,9 +26,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-alpine:3.19.1-2-SNAPSHOT as lockss-alpine
+FROM lockss/lockss-alpine:3.23.3-1-SNAPSHOT as lockss-alpine
 
-FROM eclipse-temurin:17.0.10_7-jre-alpine
+FROM eclipse-temurin:17.0.18_8-jre-alpine-3.23
 
 COPY --from=lockss-alpine /usr/local/etc/ipm/* /usr/local/etc/ipm/
 COPY --from=lockss-alpine /usr/local/bin/* /usr/local/bin/

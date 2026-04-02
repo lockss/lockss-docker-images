@@ -1,6 +1,4 @@
-#!/bin/sh
-
-# Copyright (c) 2000-2024, Board of Trustees of Leland Stanford Jr. University
+# Copyright (c) 2000-2026, Board of Trustees of Leland Stanford Jr. University
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -28,17 +26,16 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-ROOT_DIR="$(realpath "$(dirname "${0}")/..")"
-TAG_FILE="${ROOT_DIR}/VERSION"
-TAG="lockss/lockss-debian:$(cat "${TAG_FILE}")"
+FROM lockss/lockss-ipm:2.7.0-SNAPSHOT AS lockss-ipm
 
-PUSH=''
-if [ "${1}" = '--push' ]; then
-  PUSH='true'
-  shift
-fi
+FROM debian:9.13-slim
 
-docker build --tag "${TAG}" "$@" "${ROOT_DIR}" \
-&& if [ -n "${PUSH}" ]; then
-     docker push "${TAG}"
-   fi
+MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
+
+# Debian 9.13 is too old, its package repositories have been archived
+COPY /docker/apt/sources.list /etc/apt/
+
+# Install IPM
+COPY --from=lockss-ipm /usr/local/etc/ipm/* /usr/local/etc/ipm/
+COPY --from=lockss-ipm /usr/local/bin/* /usr/local/bin/
+RUN ipm-setup apt-transport-https

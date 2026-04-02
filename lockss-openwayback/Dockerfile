@@ -26,7 +26,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-debian:9.13-slim-3-SNAPSHOT AS lockss-debian
+FROM lockss/lockss-debian9:9.13-slim-4-SNAPSHOT AS lockss-debian9
 
 FROM lockss/lockss-files-log4j:2.24.3-1-SNAPSHOT AS lockss-files-log4j
 
@@ -43,11 +43,11 @@ ENV LOCKSS_WAIT_FOR_PORT_TIMEOUT=3 \
     LOCKSS_LOGS=/var/log/lockss
 
 # Debian 9.13 is too old, its package repositories have been archived
-COPY --from=lockss-debian /etc/apt/sources.list /etc/apt/sources.list
+COPY --from=lockss-debian9 /etc/apt/sources.list /etc/apt/sources.list
 
-# Inherit IPM from lockss-debian
-COPY --from=lockss-debian /usr/local/etc/ipm/* /usr/local/etc/ipm/
-COPY --from=lockss-debian /usr/local/bin/* /usr/local/bin/
+# Inherit IPM from lockss-debian9
+COPY --from=lockss-debian9 /usr/local/etc/ipm/* /usr/local/etc/ipm/
+COPY --from=lockss-debian9 /usr/local/bin/* /usr/local/bin/
 RUN ipm-setup apt-transport-https
 
 # Log4j mitigation
