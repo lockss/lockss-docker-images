@@ -3,6 +3,12 @@ Release Notes
 =============
 
 -----------
+12.7-slim-3
+-----------
+
+Released: NOT YET RELEASED
+
+-----------
 12.7-slim-2
 -----------
 
