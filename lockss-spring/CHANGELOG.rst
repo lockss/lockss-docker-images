@@ -6,7 +6,7 @@ Release Notes
 2.12.0
 ------
 
-Released: NOT YET RELEASED
+Released: 2026-04-02
 
 *  Use ``command -v`` instead of ``which``.
 
