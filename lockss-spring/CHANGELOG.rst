@@ -6,7 +6,13 @@ Release Notes
 2.12.0
 ------
 
-???
+Released: NOT YET RELEASED
+
+*  Use ``command -v`` instead of ``which``.
+
+*  Notice if ``Apply_Config`` or ``mkdir -p $LOCKSS_HOME/etc`` fail.
+
+*  Make Solr dependent on ``$USE_SOLR_INDEX``.
 
 ------
 2.11.0
@@ -14,11 +20,15 @@ Release Notes
 
 Released: 2024-07-24
 
-* Switched to Eclipse Temurin 17.0.10_7
-* Added support for Java 17
-* Added support for log rotation and redirection
-* Added support for additional user configuration 
-* Disabled stdout log timestamps for now
+*  Switched to Eclipse Temurin 17.0.10_7.
+
+*  Added support for Java 17.
+
+*  Added support for log rotation and redirection.
+
+*  Added support for additional user configuration.
+
+*  Disabled stdout log timestamps for now.
 
 ------
 2.10.0
