@@ -168,7 +168,6 @@ Check_Set "${PYWB_PORT}" PYWB_PORT
 Check_Set "${REPO_HOST}" REPO_HOST
 Check_Set "${REPO_REST_PORT}" REPO_REST_PORT
 
-Check_Set "${INIT_COLLECTION}"
 Check_Dir "${VOLUME_DIR}"
 
 Check_Set "${SECRETS}" SECRETS
@@ -196,4 +195,5 @@ fi
 
 # Invoke (exec) the original webrecorder/pywb entrypoint; TODO: $@ ?
 cd "${VOLUME_DIR}"
+unset INIT_COLLECTION
 exec "${PYWB_HOME}/docker-entrypoint.sh" uwsgi /uwsgi/uwsgi.ini

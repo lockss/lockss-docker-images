@@ -34,6 +34,10 @@ collections:
             api_url: http://${REPO_AUTH}@${REPO_HOST}:${REPO_REST_PORT}/wayback/cdx/pywb/lockss?url={url}&closest={timestamp}
             replay_url: ""
 
+# Disable auto-discovery of collections from the filesystem.
+# Collections are explicitly defined above.
+collections_root: ''
+
 # Settings for each collection
 use_js_obj_proxy: true
 

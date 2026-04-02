@@ -43,8 +43,7 @@ ENV LOCKSS_WAIT_FOR_PORT_TIMEOUT=3 \
     PYWB_PORT=8080 \
     LOCKSS_LOGS=/var/log/lockss
 
-ENV INIT_COLLECTION=${PYWB_COLLECTION} \
-    VOLUME_DIR=${PYWB_DATA}
+ENV VOLUME_DIR=${PYWB_DATA}
 
 # Inherit IPM from lockss-debian
 COPY --from=lockss-debian /usr/local/etc/ipm/* /usr/local/etc/ipm/
