@@ -1,6 +1,4 @@
-#!/bin/sh
-
-# Copyright (c) 2000-2023, Board of Trustees of Leland Stanford Jr. University
+# Copyright (c) 2000-2026, Board of Trustees of Leland Stanford Jr. University
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -28,4 +26,16 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-dpkg --status "${1}" 2> /dev/null | grep --quiet 'Status:.*installed'
+FROM lockss/lockss-ipm:2.7.0 AS lockss-ipm
+
+FROM debian:9.13-slim
+
+MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
+
+# Debian 9.13 is too old, its package repositories have been archived
+COPY /docker/apt/sources.list /etc/apt/
+
+# Install IPM
+COPY --from=lockss-ipm /usr/local/etc/ipm/* /usr/local/etc/ipm/
+COPY --from=lockss-ipm /usr/local/bin/* /usr/local/bin/
+RUN ipm-setup apt-transport-https
