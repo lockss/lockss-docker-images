@@ -4,7 +4,7 @@ This Dockerfile is used to build the LOCKSS-customized OpenWayback Docker image 
 
 # Building
 
-1. Download the latest `lockss/lockss-ipm` and `lockss/lockss-debian` Docker images into your development environment.
+1. Download the latest `lockss/lockss-ipm` and `lockss/lockss-debian9` Docker images into your development environment.
    Alternatively, build these images (recommended).
 2. Build the `iipc/openwayback:2.4.1-1-SNAPSHOT` image from our clone of the official IIPC project:
    * `git clone git@github.com:lockss/openwayback.git && cd openwayback`

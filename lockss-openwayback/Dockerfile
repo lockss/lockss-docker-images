@@ -1,4 +1,4 @@
-# Copyright (c) 2000-2024, Board of Trustees of Leland Stanford Jr. University
+# Copyright (c) 2000-2026, Board of Trustees of Leland Stanford Jr. University
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@
 
 FROM lockss/lockss-debian9:9.13-slim-4-SNAPSHOT AS lockss-debian9
 
-FROM lockss/lockss-files-log4j:2.24.3-1-SNAPSHOT AS lockss-files-log4j
+FROM lockss/lockss-files-log4j:2.25.3-1-SNAPSHOT AS lockss-files-log4j
 
 FROM iipc/openwayback:2.4.1-1-SNAPSHOT
 
