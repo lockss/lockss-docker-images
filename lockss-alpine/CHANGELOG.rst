@@ -6,7 +6,9 @@ Release Notes
 3.19.1-2
 --------
 
-???
+Released: 2026-04-02
+
+No significant changes since 3.19.1-1.
 
 --------
 3.19.1-1
@@ -14,7 +16,7 @@ Release Notes
 
 Released: 2024-07-24
 
-* Updated Alpine to 3.19.1
+*  Updated Alpine to 3.19.1.
 
 --------
 3.18.2-1
