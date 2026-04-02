@@ -1,4 +1,4 @@
-# LOCKSS OpenWayback Docker Image
+# LOCKSS Pywb Docker Image
 
 This Dockerfile defines a slightly LOCKSS-specialized Pywb Docker image based on `webrecorder/pywb`.
 

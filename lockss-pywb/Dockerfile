@@ -1,4 +1,4 @@
-# Copyright (c) 2000-2023, Board of Trustees of Leland Stanford Jr. University
+# Copyright (c) 2000-2026, Board of Trustees of Leland Stanford Jr. University
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -26,9 +26,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-debian:9.13-slim-2 AS lockss-debian
+FROM lockss/lockss-debian:12.7-slim-3 AS lockss-debian
 
-FROM webrecorder/pywb:2.4.2
+FROM webrecorder/pywb:2.8.3
 
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
 
@@ -43,8 +43,7 @@ ENV LOCKSS_WAIT_FOR_PORT_TIMEOUT=3 \
     PYWB_PORT=8080 \
     LOCKSS_LOGS=/var/log/lockss
 
-ENV INIT_COLLECTION=${PYWB_COLLECTION} \
-    VOLUME_DIR=${PYWB_DATA}
+ENV VOLUME_DIR=${PYWB_DATA}
 
 # Inherit IPM from lockss-debian
 COPY --from=lockss-debian /usr/local/etc/ipm/* /usr/local/etc/ipm/
