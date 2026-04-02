@@ -6,7 +6,9 @@ Release Notes
 1.1.0
 -----
 
-Released: NOT YET RELEASED
+Released: 2026-04-02
+
+No significant changes since 1.0.0.
 
 -----
 1.0.0
