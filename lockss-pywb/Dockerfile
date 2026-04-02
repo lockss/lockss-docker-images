@@ -26,7 +26,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-debian:12.7-slim-2-SNAPSHOT AS lockss-debian
+FROM lockss/lockss-debian:12.7-slim-4-SNAPSHOT AS lockss-debian
 
 FROM webrecorder/pywb:2.8.3
 
