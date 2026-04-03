@@ -28,7 +28,7 @@
 
 FROM lockss/lockss-debian9:9.13-slim-5 AS lockss-debian9
 
-FROM lockss/lockss-files-log4j:2.25.4-1 AS lockss-files-log4j
+FROM lockss/lockss-files-log4j:2.25.4-2 AS lockss-files-log4j
 
 FROM iipc/openwayback:2.4.1-1-SNAPSHOT
 
