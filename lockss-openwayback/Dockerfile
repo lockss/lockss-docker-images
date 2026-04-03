@@ -1,4 +1,4 @@
-# Copyright (c) 2000-2023, Board of Trustees of Leland Stanford Jr. University
+# Copyright (c) 2000-2026, Board of Trustees of Leland Stanford Jr. University
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -26,11 +26,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-debian:9.13-slim-2 AS lockss-debian
+FROM lockss/lockss-debian9:9.13-slim-5 AS lockss-debian9
 
-FROM lockss/lockss-files-log4j:2.19.0-1 AS lockss-files-log4j
+FROM lockss/lockss-files-log4j:2.25.4-2 AS lockss-files-log4j
 
-FROM iipc/openwayback:openwayback-2.4.0
+FROM iipc/openwayback:2.4.1-1-SNAPSHOT
 
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
 
@@ -42,9 +42,12 @@ ENV LOCKSS_WAIT_FOR_PORT_TIMEOUT=3 \
     OPENWB_COLLECTION=lockss \
     LOCKSS_LOGS=/var/log/lockss
 
-# Inherit IPM from lockss-debian
-COPY --from=lockss-debian /usr/local/etc/ipm/* /usr/local/etc/ipm/
-COPY --from=lockss-debian /usr/local/bin/* /usr/local/bin/
+# Debian 9.13 is too old, its package repositories have been archived
+COPY --from=lockss-debian9 /etc/apt/sources.list /etc/apt/sources.list
+
+# Inherit IPM from lockss-debian9
+COPY --from=lockss-debian9 /usr/local/etc/ipm/* /usr/local/etc/ipm/
+COPY --from=lockss-debian9 /usr/local/bin/* /usr/local/bin/
 RUN ipm-setup apt-transport-https
 
 # Log4j mitigation
@@ -52,6 +55,7 @@ RUN rm /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/log4j*.jar
 COPY --from=lockss-files-log4j /lockss-files-log4j/log4j-api-*.jar \
                                /lockss-files-log4j/log4j-core-*.jar \
                                /lockss-files-log4j/log4j-1.2-api-*.jar \
+                               /lockss-files-log4j/jspecify-*.jar \
                                /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/
 
 COPY /docker/openwayback/* /usr/local/share/lockss-openwayback/
