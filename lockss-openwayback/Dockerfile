@@ -26,11 +26,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-debian9:9.13-slim-4-SNAPSHOT AS lockss-debian9
+FROM lockss/lockss-debian9:9.13-slim-6-SNAPSHOT AS lockss-debian9
 
-FROM lockss/lockss-files-log4j:2.25.3-1-SNAPSHOT AS lockss-files-log4j
+FROM lockss/lockss-files-log4j:2.25.4-2-SNAPSHOT AS lockss-files-log4j
 
-FROM iipc/openwayback:2.4.1-1-SNAPSHOT
+FROM iipc/openwayback:2.4.1-2-SNAPSHOT
 
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
 
@@ -55,6 +55,7 @@ RUN rm /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/log4j*.jar
 COPY --from=lockss-files-log4j /lockss-files-log4j/log4j-api-*.jar \
                                /lockss-files-log4j/log4j-core-*.jar \
                                /lockss-files-log4j/log4j-1.2-api-*.jar \
+                               /lockss-files-log4j/jspecify*.jar \
                                /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/
 
 COPY /docker/openwayback/* /usr/local/share/lockss-openwayback/
