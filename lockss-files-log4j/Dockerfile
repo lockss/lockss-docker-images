@@ -28,4 +28,4 @@
 
 FROM scratch
 
-COPY /docker/log4j/log4j*.jar /lockss-files-log4j/
+COPY /docker/log4j/*.jar /lockss-files-log4j/
