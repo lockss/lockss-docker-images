@@ -26,9 +26,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-debian9:9.13-slim-4-SNAPSHOT AS lockss-debian9
+FROM lockss/lockss-debian9:9.13-slim-5 AS lockss-debian9
 
-FROM lockss/lockss-files-log4j:2.25.3-1-SNAPSHOT AS lockss-files-log4j
+FROM lockss/lockss-files-log4j:2.25.4-1 AS lockss-files-log4j
 
 FROM iipc/openwayback:2.4.1-1-SNAPSHOT
 
