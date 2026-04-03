@@ -38,5 +38,8 @@ if [ -z "${VER}" ] ; then
   exit 1
 fi
 
+JSPECIFY=1.0.0
+
 cd "${_D0}/../docker/log4j" \
-&& wget `for a in log4j-1.2-api log4j-api log4j-core log4j-slf4j-impl log4j-web ; do echo "https://repo1.maven.org/maven2/org/apache/logging/log4j/${a}/${VER}/${a}-${VER}.jar" ; done`
+&& wget `for a in log4j-1.2-api log4j-api log4j-core log4j-slf4j-impl log4j-web ; do echo "https://repo1.maven.org/maven2/org/apache/logging/log4j/${a}/${VER}/${a}-${VER}.jar" ; done` \
+&& wget "https://repo1.maven.org/maven2/org/jspecify/jspecify/${JSPECIFY}/jspecify-${JSPECIFY}.jar"
