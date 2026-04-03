@@ -55,6 +55,7 @@ RUN rm /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/log4j*.jar
 COPY --from=lockss-files-log4j /lockss-files-log4j/log4j-api-*.jar \
                                /lockss-files-log4j/log4j-core-*.jar \
                                /lockss-files-log4j/log4j-1.2-api-*.jar \
+                               /lockss-files-log4j/jspecify-*.jar \
                                /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/
 
 COPY /docker/openwayback/* /usr/local/share/lockss-openwayback/
