@@ -28,7 +28,7 @@
 
 FROM lockss/lockss-ipm:2.8.0-SNAPSHOT as lockss-ipm
 
-FROM alpine:3.23.3
+FROM alpine:3.24.3
 
 MAINTAINER "LOCKSS Buildmaster" <buildmaster@lockss.org>
 
