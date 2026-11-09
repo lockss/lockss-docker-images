@@ -3,12 +3,12 @@ Release Notes
 =============
 
 --------
-3.23.3-1
+3.24.3-1
 --------
 
-Released: NOT YET RELEASE
+Released: 2026-11-09
 
-*  Upgraded Alpine to 3.23.3.
+*  Upgraded Alpine to 3.24.3.
 
 --------
 3.19.1-2
