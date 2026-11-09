@@ -6,9 +6,9 @@ Release Notes
 2.8.0
 -----
 
-Released: NOT YET RELEASED
+Released: 2026-11-09
 
-*  Upgraded to Busybox 1.37.0.
+*  Upgraded to Busybox 1.38.0.
 
 -----
 2.7.0
