@@ -26,7 +26,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-FROM lockss/lockss-alpine:3.24.3-1-SNAPSHOT as lockss-alpine
+FROM lockss/lockss-alpine:3.24.3-1 as lockss-alpine
 
 FROM eclipse-temurin:17.0.20.1_1-jre-alpine-3.24
 

@@ -6,9 +6,9 @@ Release Notes
 2.13.0
 ------
 
-Released: NOT YET RELEASED
+Released: 2026-11-09
 
-*  Upgraded to Eclipse Temurin 17.0.18_8-jre-alpine-3.23.
+*  Upgraded to Eclipse Temurin 17.0.20.1_1-jre-alpine-3.24.
 
 ------
 2.12.0
